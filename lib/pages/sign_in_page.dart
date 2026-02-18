@@ -29,7 +29,6 @@ class _SignInPageState extends State<SignInPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     signInController = Get.put(SignInController(this));
   }
 

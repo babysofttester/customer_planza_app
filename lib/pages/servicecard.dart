@@ -28,7 +28,7 @@ class ServiceCard extends StatelessWidget {
         onTap: () => controller.toggleSelection(index),
         child: Container(
           padding: compact
-              ? const EdgeInsets.symmetric(horizontal: 5, vertical: 10)
+              ? const EdgeInsets.symmetric(horizontal: 5, vertical: 5)
               : const EdgeInsets.all(3),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -52,8 +52,8 @@ class ServiceCard extends StatelessWidget {
                 children: [
                   Image.asset(
                     item.image,
-                    height: compact ? 70 : Get.height * 0.08,
-                    width: compact ? 70 : Get.width * 0.12,
+                    height: compact ? 60 : Get.height * 0.08,
+                    width: compact ? 60 : Get.width * 0.12,
                     fit: BoxFit.contain,
                   ),
 

@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:core' as Utils;
+import 'dart:core';
 import 'package:customer_app_planzaa/common/constants.dart';
+import 'package:customer_app_planzaa/common/load_manager.dart';
 import 'package:customer_app_planzaa/core/api/api_endpoint.dart';
 import 'package:customer_app_planzaa/modal/servicemodal.dart';
 import 'package:customer_app_planzaa/modal/services_response_model.dart';
@@ -13,7 +16,11 @@ class ServiceController extends GetxController {
    ServiceController(this._tickerProvider);
 
   //final isLoading = false.obs;
-  final services = <ServiceItem>[].obs;
+  //final services = <ServiceItem>[].obs;
+  RxList<ServiceItem> services = <ServiceItem>[].obs;
+ // RxList<String> selectedServiceIds = <String>[].obs;
+  RxList<int> selectedServiceIds = <int>[].obs;
+
 
   var selectedIndexes = <int>[].obs;
   bool allowMultiple = true;
@@ -37,7 +44,7 @@ class ServiceController extends GetxController {
 Future<void> fetchServices() async {
   try {
    // isLoading.value = true;
-
+_tickerProvider;
     if (authToken == null || authToken!.isEmpty) {
       print("TOKEN IS NULL");
       Get.snackbar("Error", "User not logged in");
@@ -77,24 +84,35 @@ Future<void> fetchServices() async {
     }
 
   } catch (e) {
-    print("Service error: $e");
+       LoaderManager.hideLoader();
+          e.printError();
+          e.printInfo();
+          Utils.print(e.toString());
+  //  print("Service error: $e");
     Get.snackbar("Error", e.toString());
   } finally {
+    _tickerProvider;
     //isLoading.value = false;
   }
 }
 
-  // Selection logic
-  void toggleSelection(int index) {
-    if (allowMultiple) {
-      selectedIndexes.contains(index)
-          ? selectedIndexes.remove(index)
-          : selectedIndexes.add(index);
-    } else {
-      selectedIndexes.value = [index];
-    }
-  }
 
-  bool isSelected(int index) =>
-      selectedIndexes.contains(index);
+
+ 
+  // Selection logic
+void toggleSelection(int index) {
+  final id = services[index].id ?? 0;
+
+  if (selectedServiceIds.contains(id)) {
+    selectedServiceIds.remove(id);
+  } else {
+    selectedServiceIds.add(id);
+  }
+}
+
+
+  bool isSelected(int index) {
+    return selectedServiceIds.contains(services[index].id);
+  }
+  
 }

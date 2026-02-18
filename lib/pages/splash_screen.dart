@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:customer_app_planzaa/common/assets.dart';
 import 'package:customer_app_planzaa/common/constants.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/modal/login_response_model.dart';
+import 'package:customer_app_planzaa/pages/home.dart';
 import 'package:customer_app_planzaa/pages/sign_in_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -26,14 +28,19 @@ class _SplashScreenState extends State<SplashScreen>
   int? isLogin;
   String? loginResponseKey;
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    Future.delayed(const Duration(seconds: 3), () {}).then((value) {
-      getLoginStatus();
-    });
-  }
+  //   Future.delayed(const Duration(seconds: 3), () {}).then((value) {
+  //     getLoginStatus();
+  //   });
+  // }
+@override
+void initState() {
+  super.initState();
+  Future.delayed(const Duration(seconds: 3), getLoginStatus);
+}
 
   @override
   // ignore: unnecessary_overrides
@@ -49,16 +56,57 @@ class _SplashScreenState extends State<SplashScreen>
 
     loginResponseKey = prefs.getString(Constants.KEY_LOGIN_RESPONSE);
     String? storedData = prefs.getString(Constants.KEY_LOGIN_RESPONSE);
+    
+//     if (isLogin == 1) {
+//   if (storedData != null && storedData.isNotEmpty) {
+//     try {
+//       storedData = storedData.trim();
+//       var decodedData = json.decode(storedData);
+
+//       Map<String, dynamic> jsonDataMap = json.decode(storedData);
+
+    
+//       if (jsonDataMap['data'] != null &&
+//           jsonDataMap['data']['auth_token'] != null) {
+
+//         String authToken = jsonDataMap['data']['auth_token'];
+//         await prefs.setString(Constants.AUTH_TOKEN, authToken);
+
+//         LoginResponseModel userModel =
+//             LoginResponseModel.fromJson(decodedData);
+
+//         Constants.loginResponseModel = userModel;
+
+//         Utils.print("authtoken: $authToken");
+
+//         Get.offAll(() => const Home());
+//       } else {
+//         print("Auth token not found");
+//         Get.offAll(() => const SignInPage());
+//       }
+
+//     } catch (e) {
+//       print("ERROR IN SPLASH: $e"); 
+//       Get.offAll(() => const SignInPage());
+//     }
+//   } else {
+//     Get.offAll(() => const SignInPage());
+//   }
+// }
+
+    
+    
     if (isLogin == 1) {
       // Ignore: unnecessary_null_comparison
       if (storedData != null && storedData.isNotEmpty) {
+        log("${storedData} stored data ");
         try {
           // Decode stored data
           storedData = storedData.trim();
           var decodedData = json.decode(storedData);
 
           Map<String, dynamic> jsonDataMap = json.decode(storedData);
-          String authToken = jsonDataMap['data']['auth_token'];
+          String authToken = jsonDataMap['data']['token'];
           prefs.setString(Constants.AUTH_TOKEN, authToken);
           LoginResponseModel userModel = LoginResponseModel.fromJson(
             decodedData,
@@ -66,10 +114,14 @@ class _SplashScreenState extends State<SplashScreen>
           Constants.loginResponseModel = userModel;
           Utils.print("authtoken: $authToken");
           // ignore: empty_catches
-        } catch (e) {}
+
+           Get.offAll(() => const Home());
+        } catch (e) {
+          log("$e error in catch");
+        }
       } else {
         if (kDebugMode) {
-          print('No stored data found.');
+          log('No stored data found.');
         }
       }
     } else if (isLogin == 0 || isLogin == null) {

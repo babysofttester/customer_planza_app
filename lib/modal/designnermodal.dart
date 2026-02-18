@@ -70,22 +70,22 @@ class DesignerItem {
 String getServiceImage(String title) {
   switch (title.toLowerCase().trim()) {
     case "2d design":
-      return "assets/2D_&_3D_Design.png";
+      return "assets/images/2D_&_3D_Design.png";
 
     case "3d design":
-      return "assets/Structural_Design.png";
+      return "assets/images/Structural_Design.png";
 
     case "interior design":
-      return "assets/Interior_Design.png";
+      return "assets/images/Interior_Design.png";
 
     case "mep layouts":
-      return "assets/Electrical_&_Plumbing.png";
+      return "assets/images/Electrical_&_Plumbing.png";
 
     case "structural drawings":
-      return "assets/structural_drawing.png";
+      return "assets/images/structural_drawing.png";
 
     default:
-      return "assets/Structural_Design.png";
+      return "assets/images/Structural_Design.png";
   }
 }
 

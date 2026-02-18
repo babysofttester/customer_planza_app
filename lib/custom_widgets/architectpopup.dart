@@ -2,24 +2,39 @@
 
 import 'package:customer_app_planzaa/controller/addProjectController.dart';
 import 'package:customer_app_planzaa/custom_widgets/searchabledropdown.dart';
+import 'package:customer_app_planzaa/pages/addproject.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import '../controller/bottomnavcontroller.dart';
 
 class ArchitectPopup extends StatefulWidget {
-  const ArchitectPopup({super.key});
+    final int projectId; 
+  const ArchitectPopup({super.key, required this.projectId});
 
   @override
   State<ArchitectPopup> createState() => _ArchitectPopupState();
 }
 
-class _ArchitectPopupState extends State<ArchitectPopup> {
+class _ArchitectPopupState extends State<ArchitectPopup>  with TickerProviderStateMixin  {
   String? selectedState;
   String? selectedDistrict;
+ 
+ late final AddProjectController controller;
+  // final AddProjectController controller =
+  //   Get.put(AddProjectController());
 
-  late final AddProjectController controller;
+
+@override
+void initState() {
+  super.initState();
+  controller = Get.put(AddProjectController(this));
+
+  controller.fetchStates();   // 🔥 THIS IS MISSING
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,15 +86,16 @@ class _ArchitectPopupState extends State<ArchitectPopup> {
             //   controller.fetchCities(val!);
             // },
             // ),
-            SearchableDropdown(
-              hint: "Select State",
-              items: controller.states,
-              value: controller.selectedState.value,
-              onSelected: (val) {
-                controller.selectedState.value = val;
-                controller.fetchCities(val);
-              },
-            ),
+           Obx(() => SearchableDropdown(
+      hint: "Select State",
+      items: controller.states,
+      value: controller.selectedState.value,
+      onSelected: (val) {
+        controller.selectedState.value = val;
+        controller.fetchCities(val);
+      },
+)),
+
 
 
             const SizedBox(height: 12),
@@ -103,14 +119,15 @@ class _ArchitectPopupState extends State<ArchitectPopup> {
             // },
             // ),
 
-            SearchableDropdown(
-              hint: "Select District",
-              items: controller.cities,
-              value: controller.selectedCity.value,
-              onSelected: (val) {
-                controller.selectedCity.value = val;
-              },
-            ),
+          Obx(() => SearchableDropdown(
+      hint: "Select District",
+      items: controller.cities,
+      value: controller.selectedCity.value,
+      onSelected: (val) {
+        controller.selectedCity.value = val;
+      },
+)),
+
 
             const SizedBox(height: 20),
 
@@ -126,7 +143,7 @@ class _ArchitectPopupState extends State<ArchitectPopup> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Get.to(()=>AddProject(projectId: widget.projectId)); 
 
                   // final nav = Get.find<BottomNavController>();
                   // nav.changeIndex(1);
@@ -143,7 +160,7 @@ class _ArchitectPopupState extends State<ArchitectPopup> {
               ),
             ),
           ],
-        ),
+        ), 
       ),
     );
   }

@@ -47,6 +47,8 @@
 //   }
 // }
 import 'dart:convert';
+import 'package:customer_app_planzaa/common/appBar.dart';
+import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/controller/dsignerController.dart';
 import 'package:customer_app_planzaa/pages/designerCard.dart';
 import 'package:flutter/material.dart';
@@ -62,15 +64,19 @@ class DesignerScreen extends StatefulWidget {
   State<DesignerScreen> createState() => _DesignerScreenState();
 }
 
-class _DesignerScreenState extends State<DesignerScreen> {
+class _DesignerScreenState extends State<DesignerScreen> with TickerProviderStateMixin {
 
-  final DesignerController controller =
-  Get.put(DesignerController());
+  // final DesignerController controller =
+  // Get.put(DesignerController());
+
+
+  late final DesignerController controller;
+
   @override
   void initState() {
     super.initState();
 
-    final controller = Get.find<DesignerController>();
+    controller = Get.put(DesignerController(this));
 
     if (controller.state != null && controller.district != null) {
       controller.fetchDesigners();
@@ -81,16 +87,13 @@ class _DesignerScreenState extends State<DesignerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: CustomColors.white,
+      appBar: const CustomAppBar(title: "Designers"),
       body: SafeArea(
         child: GetBuilder<DesignerController>(
-          init: DesignerController(),   // VERY IMPORTANT
+         // init: DesignerController(),  
           builder: (controller) {
-            if (controller.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+        
 
             if (controller.designers.isEmpty) {
               return const Center(
@@ -105,7 +108,7 @@ class _DesignerScreenState extends State<DesignerScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: DesignerCard(
-                    item: controller.designers[index],
+                    item: controller.designers[index], 
                     currencySymbol: controller.currencySymbol,
                   ),
                 );

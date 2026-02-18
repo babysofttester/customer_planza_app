@@ -1,6 +1,10 @@
 
 
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/modal/projectmodal.dart';
+import 'package:customer_app_planzaa/pages/addproject.dart';
+import 'package:customer_app_planzaa/pages/projectDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -17,99 +21,136 @@ class ProjectCards extends StatelessWidget {
     super.key,
     required this.item,
   });
+Color _statusColor(String status) {
+  final s = status.toLowerCase().trim();
 
-  Color _statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return const Color(0xFF53AC40);
+  switch (s) {
+    case 'completed':
+      return const Color(0xFF53AC40); // Green
+ 
+    case 'payment pending':
+      return const Color.fromARGB(255, 56, 41, 219); // Purple
 
-      case 'payment_pending':
-      case 'pending':
-        return const Color(0xFF6F67C5);
+    case 'progress':
+      return Colors.orange; // Orange
 
-      case 'in_progress':
-        return Colors.orange;
+    case 'review pending':
+      return Colors.blue; // Blue
 
-      default:
-        return Colors.grey;
-    }
+    case 'incompleted':
+    // case 'incompleted': // handle typo from server
+      return Colors.red; // Red
+
+    case 'draft':
+      return Colors.grey; // Grey
+ 
+    default:
+      return Colors.black45; // fallback
   }
+}
+
+//payment pending, progress, review pending, completed, incompletd, draft
+
 
 
   @override
   Widget build(BuildContext context) {
     final statusColor = _statusColor(item.status);
+    final status = item.status.toLowerCase().trim();
+ 
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-      //  border: Border.all(color: AppColors.primary),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.19),
-            blurRadius: 12,
-            offset: const Offset(0, 9),
-          ),
-        ],
+
+    return InkWell(
+    onTap: () {
+      if (status == 'draft') {
+       
+        Get.to(() => AddProject(
+              projectId: item.id, 
+            ));
+      } else {
+        
+        Get.to(() => ProjectDetail(
+              projectId: item.id,
+            ));
+      }
+    },
+      child: Container(
+  padding: const EdgeInsets.all(16),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(6),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.19),
+        blurRadius: 12,
+        offset: const Offset(0, 9),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    ],
+  ),
+  child: Row(
+    children: [
+
+      /// LEFT CONTENT
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Project ID ',
-                      // style: AppFonts.proHead(),
-                    ),
-                    Text(
-                      item.title,
-                      // style: AppFonts.proHead(),
-                    ),
-                  ],
+                Utils.textView(
+                  'Project ID ${item.title}',
+                  Get.width * 0.035,
+                  CustomColors.black,
+                  FontWeight.w600,
                 ),
-
-                const SizedBox(height: 4),
-                SizedBox(
-                  width: Get.width * 0.6,
-                  child: Text(
-                    item.subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    // style: AppFonts.prosubHead(),
-                  ),
-                ),
-
-
-
               ],
             ),
-          ),
 
+            const SizedBox(height: 4),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(5),
-             // border: Border.all(color: statusColor),
-            ),
-            child: Text(
-              item.status.replaceAll('_', ' ').capitalizeFirst ?? '',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: statusColor,
+            SizedBox(
+              width: Get.width * 0.5,
+              child: Utils.textViewPro(
+                item.subtitle,
+                Get.width * 0.035,
+                CustomColors.black,
+                FontWeight.w500,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-
-          ),
-        ],
+            
+          
+          
+          ],
+        ),
       ),
+
+      /// STATUS BADGE
+      Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: statusColor.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          item.status.replaceAll('_', ' ').capitalizeFirst ?? '',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: statusColor,
+          ),
+        ),
+      ),
+
+         
+     
+     
+    ],
+  ),
+      ),
+
     );
   }
 

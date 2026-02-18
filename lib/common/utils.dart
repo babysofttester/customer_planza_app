@@ -277,4 +277,27 @@ static void hideLoader() {
           color: textColor, fontSize: fontSize, fontWeight: fontWeight, fontStyle: FontStyle.italic),
     );
   }
+  static Widget textViewPro(
+  String text,
+  double fontSize,
+  Color color,
+  FontWeight fontWeight, {
+  int? maxLines,
+  TextOverflow? overflow,
+  TextAlign? textAlign,
+}) {
+  return Text(
+    text,
+    maxLines: maxLines,
+    overflow: overflow,
+    textAlign: textAlign,
+    style: TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: fontWeight,
+    ),
+  );
+}
+
+
 }

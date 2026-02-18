@@ -1,7 +1,7 @@
 import 'package:customer_app_planzaa/modal/services_response_model.dart';
 
 class ServiceItem {
-  final String id;
+  final int id;
   final String title;
   final String subtitle;
   final String image;
@@ -25,7 +25,8 @@ class ServiceItem {
   final name = (service.name ?? '').trim();
  
   return ServiceItem(
-    id: service.id.toString(),
+    id: service.id ?? 0,
+
     title: name,
     subtitle: defaultSubtitles[name.toLowerCase()] ?? '',
     image: defaultImages[name.toLowerCase()] ?? 'assets/images/house.png',

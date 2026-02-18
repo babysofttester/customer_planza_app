@@ -3,42 +3,42 @@ import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/controller/servicecontroller.dart';
 import 'package:customer_app_planzaa/custom_widgets/architectpopup.dart';
+import 'package:customer_app_planzaa/pages/addproject.dart';
 import 'package:customer_app_planzaa/pages/servicecard.dart';
 import 'package:customer_app_planzaa/pages/servicescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import '../../../modal/servicemodal.dart';
 
-
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int)? onTabChange;
+  const HomeScreen({super.key, this.onTabChange});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
-
-
 }
 
-class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   //final ServiceController serviceController = Get.put(ServiceController(ServiceController(this)));
   //final homeServices = services.where((service) => !service.fullHome).toList();
 
   // final BottomNavController navController =
   // Get.put(BottomNavController(), permanent: true);
 
-    late final ServiceController serviceController;
+  late final ServiceController serviceController;
   @override
   void initState() {
     super.initState();
     serviceController = Get.put(ServiceController(this));
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold( 
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(7),
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                                 CustomColors.textGrey,
                                 FontWeight.normal,
                               ),
-                            
+
                               SizedBox(height: Get.height * 0.02),
 
                               // Start Button
@@ -100,10 +100,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                                     vertical: 6, // ⬅ reduce vertical space
                                     horizontal: 12,
                                   ),
-                                  minimumSize: const Size(
-                                    0,
-                                    36,
-                                  ),
+                                  minimumSize: const Size(0, 36),
                                   tapTargetSize: MaterialTapTargetSize
                                       .shrinkWrap, // ⬅ removes extra tap area
                                   shape: RoundedRectangleBorder(
@@ -111,20 +108,20 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                                   ),
                                 ),
                                 onPressed: () {
-                                  // Get.find<BottomNavController>().openInner(
-                                  //   page: AddProject(
-
-                                  //   ),
-                                  //   title: "Add Project",
-                                  // );
+                                  widget.onTabChange?.call(1); // Switch to Services tab
+                                 // Get.to(()=>PageController[pageIndex =1]);
+                                  // setState(() {
+                                  //   pageIndex = 1; // Service tab index
+                                  //   appTitle = "Services";
+                                  // });
                                 },
+
                                 child: Utils.textView(
-                                  "Start a New Home Project",
+                                  "Start a New Home Project", 
                                   Get.width * 0.03,
                                   CustomColors.white,
                                   FontWeight.bold,
                                 ),
-                             
                               ),
                             ],
                           ),
@@ -154,21 +151,20 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                       FontWeight.bold,
                     ),
 
-               
                     SizedBox(height: Get.height * 0.01),
                     Obx(() {
-  final fullHomeService = serviceController.services
-      .where((s) => s.fullHome)
-      .toList();
+                      final fullHomeService = serviceController.services
+                          .where((s) => s.fullHome)
+                          .toList();
 
-  if (fullHomeService.isEmpty) {
-    return const SizedBox();
-  }
+                      if (fullHomeService.isEmpty) {
+                        return const SizedBox();
+                      }
 
-  final item = fullHomeService.first;
+                      final item = fullHomeService.first;
 
-  return FullHomeContainer(item: item);
-}),
+                      return FullHomeContainer(item: item);
+                    }),
 
                     // Container(
                     //   margin: const EdgeInsets.all(5),
@@ -215,7 +211,6 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //                   FontWeight.bold,
                     //                 ),
 
-                                   
                     //                 SizedBox(height: Get.height * 0.005),
                     //                 Utils.textView(
                     //                   'All-in-One solution, from idea to execution.',
@@ -224,7 +219,6 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //                   FontWeight.normal,
                     //                 ),
 
-                                   
                     //                 SizedBox(height: Get.height * 0.003),
 
                     //                 _featureItem('2D & 3D Design'),
@@ -297,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //                       CustomColors.black,
                     //                       FontWeight.bold,
                     //                     ),
-                                       
+
                     //                   ),
                     //                 ),
                     //               ],
@@ -320,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //                 horizontal: 12,
                     //               ),
                     //               minimumSize: const Size(0, 32),
-                                 
+
                     //               tapTargetSize: MaterialTapTargetSize
                     //                   .shrinkWrap, // ⬅ removes extra tap area
                     //               shape: RoundedRectangleBorder(
@@ -340,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //               CustomColors.white,
                     //               FontWeight.bold,
                     //             ),
-                             
+
                     //           ),
 
                     //           SizedBox(width: Get.width * 0.01),
@@ -355,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //                   size: 20,
                     //                 ),
                     //                 SizedBox(width: Get.width * 0.015),
-                                    
+
                     //                 Utils.textView(
                     //                   "4.8 rated by 1,200+ homeowners",
                     //                   Get.width * 0.02,
@@ -370,9 +364,6 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     //     ],
                     //   ),
                     // ),
-                   
-                   
-                   
                     SizedBox(height: Get.height * 0.005),
                     Obx(() {
                       final homeServices = serviceController.services
@@ -404,8 +395,6 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                       );
                     }),
 
-
-
                     // SizedBox(height: Get.height * 0.02),
                   ],
                 ),
@@ -423,21 +412,19 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
                     ),
                   ),
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (_) => const ArchitectPopup(),
-                    );
+                    // showDialog(
+                    //   context: context,
+                    //   barrierDismissible: true,
+                    //   builder: (_) => const ArchitectPopup(projectId: project.id),
+                    // );
                   },
-                  child: 
-                     Utils.textView(
-                                  "Next",
+                  child: Utils.textView(
+                    "Next",
 
-                                  Get.height * 0.02,
-                                  CustomColors.white,
-                                  FontWeight.bold,
-                                ),
-                 
+                    Get.height * 0.02,
+                    CustomColors.white,
+                    FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -446,10 +433,8 @@ class _HomeScreenState extends State<HomeScreen>  with TickerProviderStateMixin 
       ),
     );
   }
-
-
-
 }
+
 class FullHomeContainer extends StatelessWidget {
   final ServiceItem item;
 
@@ -464,10 +449,7 @@ class FullHomeContainer extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.topRight,
-          colors: [
-            Color(0x40C9DFFA),
-            Colors.white,
-          ],
+          colors: [Color(0x40C9DFFA), Colors.white],
         ),
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
@@ -481,19 +463,13 @@ class FullHomeContainer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-         
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-         
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-               
                     Utils.textView(
                       item.title,
                       Get.width * 0.03,
@@ -503,17 +479,15 @@ class FullHomeContainer extends StatelessWidget {
 
                     SizedBox(height: Get.height * 0.005),
 
-                   
                     Utils.textView(
-                     'All-in-One solution, from idea to execution.',
-                       Get.width * 0.025,
+                      'All-in-One solution, from idea to execution.',
+                      Get.width * 0.025,
                       CustomColors.black,
                       FontWeight.normal,
                     ),
 
                     SizedBox(height: Get.height * 0.003),
 
-                    
                     _featureItem('2D & 3D Design'),
                     _featureItem('Interior Design'),
                     _featureItem('Structural Design'),
@@ -523,14 +497,12 @@ class FullHomeContainer extends StatelessWidget {
                 ),
               ),
 
-            
               SizedBox(
                 width: Get.width * 0.5,
                 height: Get.height * 0.175,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-
                     Positioned(
                       top: 1,
                       right: 0,
@@ -549,15 +521,14 @@ class FullHomeContainer extends StatelessWidget {
                         ),
                         child: ClipOval(
                           child: Image.asset(
-                      'assets/images/h3.png',   
-                           // item.image, // dynamic image
-                            fit: BoxFit.cover,  
+                            'assets/images/h3.png',
+                            // item.image, // dynamic image
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
                     ),
- 
-                 
+
                     if (item.isPopular)
                       Positioned(
                         top: 10,
@@ -585,11 +556,8 @@ class FullHomeContainer extends StatelessWidget {
             ],
           ),
 
-   
           Row(
             children: [
-
-            
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1F3C88),
@@ -604,11 +572,11 @@ class FullHomeContainer extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (_) => const ArchitectPopup(),
-                  );
+                  // showDialog(
+                  //   context: context,
+                  //   barrierDismissible: true,
+                  //   builder: (_) => const ArchitectPopup(),
+                  // );
                 },
                 child: Utils.textView(
                   "Start ${item.title}",
@@ -624,11 +592,7 @@ class FullHomeContainer extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                      size: 20,
-                    ),
+                    const Icon(Icons.star, color: Colors.amber, size: 20),
                     SizedBox(width: Get.width * 0.015),
                     Utils.textView(
                       "4.8 rated by 1,200+ homeowners",
@@ -646,28 +610,27 @@ class FullHomeContainer extends StatelessWidget {
     );
   }
 }
- Widget _featureItem(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-            Assets.checkPNG,
-            // 'assets/check.png',
-            height: 14,
-            width: 14,
-          ),
-          const SizedBox(width: 4),
-          Utils.textViewStyle(
-           text,
-            Get.width * 0.025,
-            CustomColors.black,
-            FontWeight.normal,          
-          ),
-        ],
-      ),
-    );
-  }
 
-
+Widget _featureItem(String text) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 2),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Image.asset(
+          Assets.checkPNG,
+          // 'assets/check.png',
+          height: 14,
+          width: 14,
+        ),
+        const SizedBox(width: 4),
+        Utils.textViewStyle(
+          text,
+          Get.width * 0.025,
+          CustomColors.black,
+          FontWeight.normal,
+        ),
+      ],
+    ),
+  );
+}

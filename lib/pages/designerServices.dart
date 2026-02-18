@@ -1,7 +1,14 @@
+import 'package:customer_app_planzaa/common/appBar.dart';
+import 'package:customer_app_planzaa/common/assets.dart';
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/custom_widgets/choosePackage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get.dart';
+
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:video_player/video_player.dart';
@@ -29,30 +36,31 @@ class DesignerServices extends StatefulWidget {
   State<DesignerServices> createState() => _DesignerServicesState();
 }
 
-class _DesignerServicesState extends State<DesignerServices> {
+class _DesignerServicesState extends State<DesignerServices> with TickerProviderStateMixin {
   DesignerPortfolio? selectedPortfolio;
   DesignerPortfolio? selectedPortfolioDetail;
   bool isLoadingPortfolio = false;
 
-
   int selectedIndex = 0;
+  late DesignerDetailController controller;
+RxString innerTitle = "Designer Services".obs;
 
-  // void _updateAppBarTitle() {
-  //   final controller = Get.find<BottomNavController>();
 
-  //   if (selectedIndex == 0) {
-  //     controller.innerTitle.value = "Desrigner Sevices";
-  //   } else if (selectedIndex == 1) {
-  //     controller.innerTitle.value = selectedPortfolio == null
-  //         ? "Portfolio"
-  //         : "Portfolio Detail";
-  //   } else if (selectedIndex == 2) {
-  //     controller.innerTitle.value = "Proposal Screen";
-  //   }
-  // }
+void _updateAppBarTitle() {
+  if (selectedIndex == 0) {
+    controller.innerTitle.value = "Designer Services";
+  } else if (selectedIndex == 1) {
+    controller.innerTitle.value =
+        selectedPortfolioDetail == null
+            ? "Portfolio"
+            : "Portfolio Detail";
+  } else if (selectedIndex == 2) {
+    controller.innerTitle.value = "Proposal Screen";
+  }
+}
 
-  void _showVideoPopup(String videoUrl)
-  {
+
+  void _showVideoPopup(String videoUrl) {
     print("VIDEO URL: ${videoUrl}");
 
     showDialog(
@@ -61,7 +69,6 @@ class _DesignerServicesState extends State<DesignerServices> {
         backgroundColor: Colors.black,
         insetPadding: const EdgeInsets.all(10),
         child: _VideoPlayerWidget(videoUrl: videoUrl),
-
       ),
     );
   }
@@ -75,10 +82,7 @@ class _DesignerServicesState extends State<DesignerServices> {
         child: Stack(
           children: [
             InteractiveViewer(
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-              ),
+              child: Image.network(imageUrl, fit: BoxFit.contain),
             ),
             Positioned(
               top: 10,
@@ -94,15 +98,17 @@ class _DesignerServicesState extends State<DesignerServices> {
     );
   }
 
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
-    // _updateAppBarTitle();
-    Get.put(DesignerDetailController()).fetchDesignerDetail(widget.designerId);
+  controller = Get.put(DesignerDetailController(this));
 
+  _updateAppBarTitle();   // ✅ Now controller is initialized
 
-  }
+  controller.fetchDesignerDetail(widget.designerId);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +127,32 @@ class _DesignerServicesState extends State<DesignerServices> {
         final item = controller.designer!;
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: CustomColors.white,
+       appBar: AppBar(
+  backgroundColor: Colors.white,
+  elevation: 0,
+  centerTitle: true,
+  iconTheme: const IconThemeData(
+    color: CustomColors.black,
+  ),
+  title: Obx(
+    () => Utils.textView(
+      controller.innerTitle.value,
+      MediaQuery.of(context).size.width < 600
+          ? Get.width * 0.05
+          : Get.width * 0.03,
+      CustomColors.black,
+      FontWeight.bold,
+    ),
+  ),
+),
+
+//     appBar: CustomAppBar(
+//  title: Obx(() => Text(this.controller.innerTitle.value)),
+// ),
+
+
+
           body: Stack(
             children: [
               Column(
@@ -178,23 +209,19 @@ class _DesignerServicesState extends State<DesignerServices> {
   }
 
   Widget _portfolioTab(DesignerItem item) {
-    final controller = Get.find<DesignerDetailController>();
-
+   // final controller = Get.find<DesignerDetailController>();
 
     if (isLoadingPortfolio) {
       return const Center(child: CircularProgressIndicator());
     }
 
-
     if (selectedPortfolioDetail != null) {
       return _portfolioDetail(selectedPortfolioDetail!);
     }
 
-
     if (item.portfolios.isEmpty) {
       return const Center(child: Text("No Portfolio Found"));
     }
-
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
@@ -208,15 +235,18 @@ class _DesignerServicesState extends State<DesignerServices> {
               isLoadingPortfolio = true;
             });
 
-            final detail =
-            await controller.getPortfolioDetails(portfolio['id']);
+           final detail = await this.controller.getPortfolioDetails(
+  portfolio['id'],
+);
+print("DETAIL DATA: $detail");
+
 
             setState(() {
-              selectedPortfolioDetail = detail;
+              selectedPortfolioDetail = detail; 
               isLoadingPortfolio = false;
             });
 
-            // _updateAppBarTitle();
+             _updateAppBarTitle();
           },
           child: _portfolioTile(
             title: portfolio['title'] ?? '',
@@ -227,7 +257,6 @@ class _DesignerServicesState extends State<DesignerServices> {
       },
     );
   }
-
 
   Widget _portfolioDetail(DesignerPortfolio portfolio) {
     String baseUrl = "http://192.168.1.188/planzaa-live/";
@@ -244,7 +273,7 @@ class _DesignerServicesState extends State<DesignerServices> {
                   setState(() {
                     selectedPortfolioDetail = null;
                   });
-                  // _updateAppBarTitle();
+                   _updateAppBarTitle();
                 },
                 child: Row(
                   children: const [
@@ -260,8 +289,9 @@ class _DesignerServicesState extends State<DesignerServices> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(portfolio.title, 
-                  // style: AppFonts.heading(size: 16)
+                  Text(
+                    portfolio.title,
+                    // style: AppFonts.heading(size: 16)
                   ),
                   Text(
                     portfolio.year,
@@ -307,29 +337,28 @@ class _DesignerServicesState extends State<DesignerServices> {
                     },
                     child: media.mediaType == "video"
                         ? Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.black12,
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.play_circle_fill, size: 40),
-                      ),
-                    )
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.black12,
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.play_circle_fill, size: 40),
+                            ),
+                          )
                         : ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        fullUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Image.asset(
-                          "assets/bgImage.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              fullUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(
+                                Assets.bgPNG,
+                                //"assets/image/bgImage.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                   );
                 },
-
-
               ),
             ],
           ),
@@ -372,6 +401,7 @@ class _DesignerServicesState extends State<DesignerServices> {
     );
   }
 
+  
   Widget _reviewTab(DesignerItem item) {
     if (item.reviews.isEmpty) {
       return const Center(child: Text("No Reviews Yet"));
@@ -429,9 +459,13 @@ class _DesignerServicesState extends State<DesignerServices> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.name, 
-                // style: AppFonts.desHead()
+                Utils.textView(
+                  item.name,
+                  Get.width * 0.045,
+                  CustomColors.black,
+                  FontWeight.bold,
                 ),
+
                 const SizedBox(height: 4),
 
                 Row(
@@ -445,15 +479,18 @@ class _DesignerServicesState extends State<DesignerServices> {
                 ),
 
                 const SizedBox(height: 4),
-
-                Text(
+                Utils.textView(
                   "${item.projectsDone} Projects",
-                  // style: AppFonts.prosubHead(),
+                  Get.width * 0.035,
+                  CustomColors.black,
+                  FontWeight.normal,
                 ),
 
-                Text(
+                Utils.textView(
                   "${item.currencySymbol}${item.amount}",
-                  // style: AppFonts.prosubHead(),
+                  Get.width * 0.035,
+                  CustomColors.black,
+                  FontWeight.normal,
                 ),
               ],
             ),
@@ -483,16 +520,30 @@ class _DesignerServicesState extends State<DesignerServices> {
           Image.asset(getServiceImage(title), height: 55, width: 55),
           const SizedBox(width: 12),
 
-          Expanded(child: Text(title, 
-          // style: AppFonts.heading(size: 16)
-          )
+          Expanded(
+            child: 
+             Utils.textView(
+                        title,
+                          Get.width * 0.038,
+                          CustomColors.black,
+                          FontWeight.bold, 
+                        ),
+            // Text(
+            //   title,
+            //   // style: AppFonts.heading(size: 16)
+            // ),
           ),
-
-          Text(
-            '${price} /sq.ft',
-            // price,
-            // style: AppFonts.prosubHead(color: const Color(0xFF1F3C88)),
-          ),
+Utils.textView(
+                        '${price} /sq.ft',
+                          Get.width * 0.03,
+                          CustomColors.boxColor,
+                          FontWeight.normal, 
+                        ),
+          // Text(
+          //   '${price} /sq.ft',
+          //   // price,
+          //   // style: AppFonts.prosubHead(color: const Color(0xFF1F3C88)),
+          // ),
         ],
       ),
     );
@@ -509,8 +560,6 @@ class _DesignerServicesState extends State<DesignerServices> {
     String fullImageUrl = image.isNotEmpty && image.startsWith("http")
         ? image
         : baseUrl + image;
-
-
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -532,7 +581,7 @@ class _DesignerServicesState extends State<DesignerServices> {
             borderRadius: BorderRadius.circular(6),
             child: image.isEmpty
                 ? Image.asset(
-                    "assets/bgImage.png",
+                    Assets.bgPNG,
                     height: 80,
                     width: 100,
                     fit: BoxFit.cover,
@@ -544,7 +593,7 @@ class _DesignerServicesState extends State<DesignerServices> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        "assets/bgImage.png",
+                        Assets.bgPNG,
                         height: 80,
                         width: 100,
                         fit: BoxFit.cover,
@@ -556,16 +605,29 @@ class _DesignerServicesState extends State<DesignerServices> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, 
-              // style: AppFonts.heading(size: 16)
-              ),
-              Text(
-                year,
-                // style: AppFonts.prosubHead(
-                //   size: 12,
-                //   color: const Color(0xFF1F3C88),
-                // ),
-              ),
+               Utils.textView(
+                        title,
+                          Get.width * 0.038,
+                          CustomColors.black,
+                          FontWeight.bold, 
+                        ), 
+              // Text(
+              //   title,
+              //   // style: AppFonts.heading(size: 16)
+              // ),
+               Utils.textView(
+                        year,
+                          Get.width * 0.035,
+                          CustomColors.boxColor,
+                          FontWeight.normal, 
+                        ),
+              // Text(
+              //   year,
+              //   // style: AppFonts.prosubHead(
+              //   //   size: 12,
+              //   //   color: const Color(0xFF1F3C88),
+              //   // ),
+              // ),
             ],
           ),
         ],
@@ -606,9 +668,10 @@ class _DesignerServicesState extends State<DesignerServices> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name,
-                    //  style: AppFonts.heading(size: 14)
-                     ),
+                    Text(
+                      name,
+                      //  style: AppFonts.heading(size: 14)
+                    ),
                     const SizedBox(height: 4),
                     Row(
                       children: List.generate(5, (index) {
@@ -625,12 +688,14 @@ class _DesignerServicesState extends State<DesignerServices> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(comment, 
-          // style: AppFonts.prosubHead(size: 13)
+          Text(
+            comment,
+            // style: AppFonts.prosubHead(size: 13)
           ),
           const SizedBox(height: 8),
-          Text(date, 
-          // style: AppFonts.prosubHead(size: 12, color: Colors.grey)
+          Text(
+            date,
+            // style: AppFonts.prosubHead(size: 12, color: Colors.grey)
           ),
         ],
       ),
@@ -651,7 +716,7 @@ class _DesignerServicesState extends State<DesignerServices> {
                 selectedIndex = index;
                 selectedPortfolio = null; // reset detail when switching tab
               });
-              // _updateAppBarTitle();
+               _updateAppBarTitle();
             },
             child: Container(
               height: 45,
@@ -693,7 +758,7 @@ class _DesignerServicesState extends State<DesignerServices> {
             selectedIndex = index;
             selectedPortfolio = null;
           });
-          // _updateAppBarTitle();
+           _updateAppBarTitle();
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -752,8 +817,9 @@ class _DesignerServicesState extends State<DesignerServices> {
             onPressed: () {
               Get.to(() => ChoosePackage(designerId: widget.designerId));
             },
-            child: Text("Book Now", 
-            // style: AppFonts.bookButton()
+            child: Text(
+              "Book Now",
+              // style: AppFonts.bookButton()
             ),
           ),
         ),
@@ -761,6 +827,7 @@ class _DesignerServicesState extends State<DesignerServices> {
     );
   }
 }
+
 class _VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
 
@@ -777,19 +844,21 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl),
-    );
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
 
-    _controller.initialize().then((_) {
-      if (mounted) {
-        setState(() {});
-      }
-    }).catchError((error) {
-      print("VIDEO ERROR: $error");
-    });
+    _controller
+        .initialize()
+        .then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        })
+        .catchError((error) {
+          print("VIDEO ERROR: $error");
+          print("VIDEO URL: ${widget.videoUrl}");
+
+        });
   }
-
 
   @override
   void dispose() {
@@ -804,9 +873,9 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
         Center(
           child: _controller.value.isInitialized
               ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          )
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                )
               : const CircularProgressIndicator(),
         ),
         Positioned(
@@ -814,9 +883,7 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
           left: 20,
           child: IconButton(
             icon: Icon(
-              _controller.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
+              _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
               color: Colors.white,
               size: 30,
             ),

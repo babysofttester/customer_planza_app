@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +24,7 @@ class _MapPickerPageState extends State<MapPickerPage> {
 
   List<dynamic> predictions = [];
 
-  /// 🔐 Replace with your API key
+  
   static const String apiKey = "AIzaSyADcKpq2a7NQTRrMxSsD2w6SEeHQcdxahs";
 
   @override
@@ -32,17 +33,20 @@ class _MapPickerPageState extends State<MapPickerPage> {
     selectedLocation = widget.initialLocation;
   }
 
-  /// 🔍 Autocomplete API
+ 
   Future<void> getPlacePredictions(String input) async {
     if (input.isEmpty) {
       setState(() => predictions = []);
       return;
     }
 
-    final url = Uri.parse(
-      "https://maps.googleapis.com/maps/api/place/autocomplete/json"
-          "?input=$input&key=$apiKey",
-    );
+ final url = Uri.parse(
+  "https://maps.googleapis.com/maps/api/place/autocomplete/json"
+  "?input=${Uri.encodeComponent(input)}"
+  "&types=geocode"
+  "&key=$apiKey",
+);
+
 
     final response = await http.get(url);
 
@@ -87,6 +91,7 @@ class _MapPickerPageState extends State<MapPickerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColors.white,
       appBar: AppBar(title: const Text('Select Location')),
       body: Stack(
         children: [

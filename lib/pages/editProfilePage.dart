@@ -152,7 +152,7 @@ Future<void> pickImage(ImageSource source) async {
       : controller.customer?.avatar != null &&
               controller.customer!.avatar!.isNotEmpty
           ? NetworkImage(controller.customer!.avatar!)
-          : const AssetImage("assets/profile.png") as ImageProvider,
+          : const AssetImage("assets/images/profile.png") as ImageProvider,
 ),
 
                     ),
@@ -278,10 +278,17 @@ Utils.textView(
 
                     // Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
                   },
-                  child: Text(
-                    "Save",
-                    style: TextStyle(fontSize: 15, color: Colors.white),
-                  ),
+                  child:   Utils.textView(
+                                  "Save",
+
+                                  Get.height * 0.02,
+                                  CustomColors.white,
+                                  FontWeight.bold,
+                                ),
+                  // Text(
+                  //   "Save",
+                  //   style: TextStyle(fontSize: 15, color: Colors.white),
+                  // ),
                 ),
               
               

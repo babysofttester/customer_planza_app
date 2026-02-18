@@ -1,8 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="customer_app_planzaa"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+         android:usesCleartextTraffic="true"> 
+       
+
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyADcKpq2a7NQTRrMxSsD2w6SEeHQcdxahs"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

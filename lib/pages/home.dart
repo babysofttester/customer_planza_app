@@ -38,12 +38,66 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   // int pageIndex = 0;
   int? pageIndex;
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(vsync: this);
-    load();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _animationController = AnimationController(vsync: this);
+  //   load();
+
+  //     pageIndex = 0;
+
+  // final pages = [
+  //   HomeScreen(
+  //     onTabChange: (index) {
+  //       setState(() {
+  //         pageIndex = index;
+
+  //         if (index == 0) appTitle = "Home";
+  //         if (index == 1) appTitle = "Services";
+  //         if (index == 2) appTitle = "Projects";
+  //         if (index == 3) appTitle = "Order History";
+  //         if (index == 4) appTitle = "Profile";
+  //       });
+  //     },
+  //   ),
+  //   const ServiceScreen(),
+  //   ProjectPage(),
+  //   const OrderHistory(),
+  //   const ProfileScreen(),
+  // ];
+  // } 
+
+ 
+  late List<Widget> pages; 
+ @override
+void initState() {
+  super.initState();
+  _animationController = AnimationController(vsync: this);
+
+  pageIndex = 0;
+
+  pages = [
+    HomeScreen(
+      onTabChange: (index) {
+        setState(() {
+          pageIndex = index;
+
+          if (index == 0) appTitle = "Home";
+          if (index == 1) appTitle = "Services";
+          if (index == 2) appTitle = "Projects";
+          if (index == 3) appTitle = "Order History";
+          if (index == 4) appTitle = "Profile";
+        });
+      },
+    ),
+    const ServiceScreen(),
+    ProjectPage(),
+    const OrderHistory(),
+    const ProfileScreen(),
+  ];
+
+  load();
+}
 
   load() async {
     pageIndex = 0;
@@ -58,19 +112,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  final pages = [
-    const HomeScreen(),
-    const ServiceScreen(),
-    ProjectPage(),
-    const OrderHistory(),
-    const ProfileScreen(),
+  // final pages = [
+  //   const HomeScreen(),
+  //   const ServiceScreen(),
+  //   ProjectPage(),
+  //   const OrderHistory(),
+  //   const ProfileScreen(),
 
-    // const Goals(),
-    // const Obstacles(),
-    // const Actionss(),
-    // const Level(),
-    // const ShareScreen(),
-  ];
+  //   // const Goals(),
+  //   // const Obstacles(),
+  //   // const Actionss(),
+  //   // const Level(),
+  //   // const ShareScreen(),
+  // ];
+  
+  
+  
   String appTitle = "Planza";
   @override
   Widget build(BuildContext context) {

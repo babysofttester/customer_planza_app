@@ -1,21 +1,21 @@
 import 'dart:io';
 
+import 'package:customer_app_planzaa/common/appBar.dart';
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/modal/projectmodal.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 
-import '../../../../modal/projectmodal.dart';
-// import '../../../../utils/app_color.dart';
-// import '../../../../utils/app_fonts.dart';
-// import '../../../../utils/app_size.dart';
-// import '../../../../widget/controller/bottomnavcontroller.dart';
-// import '../../../Designer/Designer Services/screen/designerServices.dart';
-
 class ProjectDetail extends StatefulWidget {
   final ProjectsItem? item;
-  const ProjectDetail({super.key, this.item});
+  
+ final int projectId;
+  
+  const ProjectDetail({super.key, this.item, required this.projectId});
 
   @override
   State<ProjectDetail> createState() => _ProjectDetailState();
@@ -35,13 +35,11 @@ Color _statusColor(String status) {
 }
 
 class _ProjectDetailState extends State<ProjectDetail> {
-
   /// 🔑 REQUIRED FOR EXPAND / COLLAPSE
   final Set<int> _expandedIndexes = {};
 
   final List<File> _uploadedFiles = [];
   final List<String> _uploadedFileNames = [];
-
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -58,7 +56,6 @@ class _ProjectDetailState extends State<ProjectDetail> {
       }
     }
   }
-
 
   void _showFileNameDialog(File file) {
     final controller = TextEditingController();
@@ -82,10 +79,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                 /// TITLE
                 const Text(
                   "Enter File Name",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
 
                 const SizedBox(height: 12),
@@ -129,7 +123,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
 
                         Navigator.pop(context);
                       },
-                      child:  Text(
+                      child: Text(
                         "Save",
                         // style: AppFonts.bookButton(),
                       ),
@@ -155,10 +149,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
         );
       },
     );
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +159,8 @@ class _ProjectDetailState extends State<ProjectDetail> {
     final statusColor = _statusColor(widget.item?.status ?? '');
 
     return Scaffold(
+      backgroundColor: CustomColors.white,
+      appBar: const CustomAppBar(title: "Project Detail"),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -177,12 +170,18 @@ class _ProjectDetailState extends State<ProjectDetail> {
                 /// PROJECT ID
                 Row(
                   children: [
-                    Text('Project ID ', 
-                    // style: AppFonts.proHead2()
+                    Utils.textView(
+                      'Project ID ',
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w500,
                     ),
-                    Text(widget.item?.title ?? '',
-                        // style: AppFonts.proHead()
-                        ),
+                    Utils.textView(
+                      widget.item?.title ?? '',
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w600,
+                    ),
                   ],
                 ),
 
@@ -213,25 +212,41 @@ class _ProjectDetailState extends State<ProjectDetail> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Adam Collins',
-                                  // style: AppFonts.proMainHeading()
-                                  ),
-                              Text('Job ID: JP-43821',
-                                  // style: AppFonts.payment1()
-                                  ),
+                               Utils.textView(
+                      'Adam Collins',
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w500,
+                    ),
+                              // Text(
+                              //   'Adam Collins',
+                              //   // style: AppFonts.proMainHeading()
+                              // ),
+                               Utils.textView(
+                      'Job ID: JP-43821',
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w500,
+                    ),
+                              // Text(
+                              //   'Job ID: JP-43821',
+                              //   // style: AppFonts.payment1()
+                              // ),
                             ],
                           ),
                           Row(
                             children: const [
-                              Icon(Icons.chat_outlined,
-                                  size: 18,
-                                  //  color: AppColors.primary
-                                   ),
+                              Icon(
+                                Icons.chat_outlined,
+                                size: 18,
+                                //  color: AppColors.primary
+                              ),
                               SizedBox(width: 8),
-                              Icon(Icons.phone_outlined,
-                                  size: 18, 
-                                  // color: AppColors.primary
-                                  ),
+                              Icon(
+                                Icons.phone_outlined,
+                                size: 18,
+                                // color: AppColors.primary
+                              ),
                             ],
                           ),
                         ],
@@ -239,10 +254,11 @@ class _ProjectDetailState extends State<ProjectDetail> {
 
                       // AppSizes.paySize(),
                       Divider(height: Get.height * 0.01),
-                      // AppSizes.paySize(),
 
-                      Text('Services', 
-                      // style: AppFonts.proHeading()
+                      // AppSizes.paySize(),
+                      Text(
+                        'Services',
+                        // style: AppFonts.proHeading()
                       ),
                       // AppSizes.paySize(),
 
@@ -270,7 +286,6 @@ class _ProjectDetailState extends State<ProjectDetail> {
                           ),
                         );
                       }).toList(),
-
                     ],
                   ),
                 ),
@@ -294,30 +309,30 @@ class _ProjectDetailState extends State<ProjectDetail> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Adam Collins',
-                                  // style:
-                                  // AppFonts.proMainHeading()
-                                  ),
-                              Text('Job ID: JP-43821',
-                                  // style: AppFonts.payment1()
-                                  ),
+                              Text(
+                                'Adam Collins',
+                                // style:
+                                // AppFonts.proMainHeading()
+                              ),
+                              Text(
+                                'Job ID: JP-43821',
+                                // style: AppFonts.payment1()
+                              ),
                             ],
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color:
-                              statusColor.withOpacity(0.12),
-                              borderRadius:
-                              BorderRadius.circular(5),
+                              color: statusColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
                               widget.item?.status ?? '',
@@ -333,34 +348,38 @@ class _ProjectDetailState extends State<ProjectDetail> {
 
                       // AppSizes.proSize(),
                       Divider(height: Get.height * 0.01),
-                      // AppSizes.paySize(),
 
-                      Text('Plot Detail',
-                          // style: AppFonts.proHeading()
-                          ),
                       // AppSizes.paySize(),
+                      Text(
+                        'Plot Detail',
+                        // style: AppFonts.proHeading()
+                      ),
 
+                      // AppSizes.paySize(),
                       Row(
                         children: [
-                          Text('Length : ',
-                              // style: AppFonts.lbFont()
-                              ),
+                          Text(
+                            'Length : ',
+                            // style: AppFonts.lbFont()
+                          ),
                           const Text('50 feet'),
                           SizedBox(width: Get.width * 0.2),
-                          Text('Breadth : ',
-                              // style: AppFonts.lbFont()
-                              ),
+                          Text(
+                            'Breadth : ',
+                            // style: AppFonts.lbFont()
+                          ),
                           const Text('50 feet'),
                         ],
                       ),
 
                       // AppSizes.proSize(),
                       Divider(height: Get.height * 0.01),
-                      // AppSizes.proSize(),
 
-                      Text('Description',
-                          // style: AppFonts.proHeading()
-                          ),
+                      // AppSizes.proSize(),
+                      Text(
+                        'Description',
+                        // style: AppFonts.proHeading()
+                      ),
                       // AppSizes.paySize(),
                       Text(
                         'Nunc imperdiet ante dui, in fermentum turpis condimentum eu.',
@@ -369,11 +388,12 @@ class _ProjectDetailState extends State<ProjectDetail> {
 
                       // AppSizes.proSize(),
                       Divider(height: Get.height * 0.01),
-                      // AppSizes.proSize(),
 
-                      Text('Attachment',
-                          // style: AppFonts.proHeading()
-                          ),
+                      // AppSizes.proSize(),
+                      Text(
+                        'Attachment',
+                        // style: AppFonts.proHeading()
+                      ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
@@ -412,9 +432,12 @@ class _ProjectDetailState extends State<ProjectDetail> {
           ),
           child: Row(
             children: [
-              Expanded(child: Text(title, 
-              // style: AppFonts.payment()
-              )),
+              Expanded(
+                child: Text(
+                  title,
+                  // style: AppFonts.payment()
+                ),
+              ),
 
               Icon(
                 isCompleted
@@ -462,15 +485,14 @@ class _ProjectDetailState extends State<ProjectDetail> {
           duration: const Duration(milliseconds: 300),
           child: isExpanded
               ? Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: _expandedServiceContent(),
-          )
+                  padding: const EdgeInsets.only(top: 20),
+                  child: _expandedServiceContent(),
+                )
               : const SizedBox.shrink(),
         ),
       ],
     );
   }
-
 
   /// ================= EXPANDED CONTENT =================
   Widget _expandedServiceContent() {
@@ -484,9 +506,10 @@ class _ProjectDetailState extends State<ProjectDetail> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("File Name Here",
-                    // style: AppFonts.payment(size: 15)
-                    ),
+                Text(
+                  "File Name Here",
+                  // style: AppFonts.payment(size: 15)
+                ),
                 Text(
                   "Jan 02, 2025",
                   // style: AppFonts.payment1().copyWith(fontSize: 12),
@@ -496,8 +519,10 @@ class _ProjectDetailState extends State<ProjectDetail> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1F3C88),
-                padding:
-                const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 12,
+                ),
                 minimumSize: const Size(0, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
@@ -605,12 +630,10 @@ class _ProjectDetailState extends State<ProjectDetail> {
               );
             }),
           ),
-        ]
-
+        ],
       ],
     );
   }
-
 
   Widget _attachmentItem() {
     return Container(
@@ -621,9 +644,8 @@ class _ProjectDetailState extends State<ProjectDetail> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-        child: Image.asset('assets/bgImage.png',
-            fit: BoxFit.cover),
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset('assets/bgImage.png', fit: BoxFit.cover),
       ),
     );
   }

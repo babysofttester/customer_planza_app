@@ -1,5 +1,5 @@
 class ProjectsItem {
-  final String id;
+  final int id;
   final String title;
   final String subtitle;
   final String status;
@@ -13,10 +13,12 @@ class ProjectsItem {
 
   factory ProjectsItem.fromJson(Map<String, dynamic> json) {
     return ProjectsItem(
-      id: json['project_id']?.toString() ?? '',
+      // id: json['project_id']?.toString() ?? '',
+      id: json['project_id'] ?? 0,
+
       title: json['project_number']?.toString() ?? '',
       subtitle: (json['services'] as List?)
-          ?.map((e) => e.toString())
+         ?.map((e) => e['name'].toString())
           .join(', ') ??
           'No Services',
       status: json['project_status']?.toString() ?? '',
@@ -24,62 +26,3 @@ class ProjectsItem {
   }
 }
 
-
-// final projects = [
-//   ProjectsItem(
-//     title: '#223445',
-//     subtitle: '2D Design, 3D Design,  MEP layouts, Structural drawings, Interior Design',
-//     status: 'Completed',
-//   ),
-//
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: 'Interior Design, MEP layouts',
-//     status: 'In Progress',
-//   ),
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: '2D & 3D Design, 3D Design,  MEP layout',
-//     status: 'Completed',
-//   ),
-//
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: 'Interior Design,  Structural drawings, Interior Design',
-//     status: 'In Progress',
-//   ),
-//   ProjectsItem(
-//     title: ' #223456',
-//     subtitle: '2D & 3D Design',
-//     status: 'Completed',
-//   ),
-//
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: 'Interior Design',
-//     status: 'In Progress',
-//   ),
-//   ProjectsItem(
-//     title: ' #223456',
-//     subtitle: '2D & 3D Design',
-//     status: 'Completed',
-//   ),
-//
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: 'Interior Design',
-//     status: 'In Progress',
-//   ),
-//   ProjectsItem(
-//     title: '#223456',
-//     subtitle: '2D & 3D Design',
-//     status: 'Completed',
-//   ),
-//
-//   ProjectsItem(
-//     title: ' #223456',
-//     subtitle: 'Interior Design',
-//     status: 'In Progress',
-//   ),
-//
-// ];

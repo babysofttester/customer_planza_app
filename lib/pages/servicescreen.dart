@@ -1,6 +1,7 @@
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/controller/servicecontroller.dart';
+import 'package:customer_app_planzaa/custom_widgets/architectpopup.dart';
 import 'package:customer_app_planzaa/pages/servicecard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -31,68 +32,65 @@ class _ServiceScreenState extends State<ServiceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          children: [
+    
+ return Scaffold(
+  backgroundColor: Colors.white,
+  body: SafeArea(
+    child: Padding(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        children: [
+          
+          /// List
+      Expanded(
+  child: ListView.builder(
+    physics: const NeverScrollableScrollPhysics(), 
+    itemCount: serviceController.services.length,
+    itemBuilder: (context, index) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: ServiceCard(
+          item: serviceController.services[index],
+          index: index,
+          compact: true,
+        ),
+      );
+    },
+  ),
+),
 
-            Expanded(
-              child: Obx(() {
-                return GridView.builder(
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    mainAxisSpacing: 4,
-                    childAspectRatio: 4.5,
-                  ),
-                  itemCount: serviceController.services.length,
-                  itemBuilder: (context, index) {
-                    return ServiceCard(
-                      item: serviceController.services[index],
-                      index: index,
-                      compact: true,
-                    );
-                  },
-                );
-              }),
-            ),
 
-            SizedBox(height: Get.height * 0.018),
-
-            SizedBox(
-              width: double.infinity,
-              height: 40,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:CustomColors.boxColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
+          /// Button
+          SizedBox(
+            width: double.infinity,
+            height: 45, // adjustable height
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.boxColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                onPressed: () {
-                  // Get.find<BottomNavController>().openInner( 
-                  // page: AddProject(), 
-                  // title: "Add Project", 
-                  // );
-                },
-                child: 
-                 Utils.textView(
-                            "Nextss",
-                            Get.height * 0.018,
-                            CustomColors.white,
-                            FontWeight.normal,
-                          ), 
-                // const Text(
-                //   "Next",
-                //   style: TextStyle(
-                //       fontSize: 15, color: Colors.white),
-                // ),
+              ),
+              onPressed: () {
+                //  showDialog(
+                //       context: context,
+                //       barrierDismissible: true,
+                //       builder: (_) => const ArchitectPopup(),
+                //     );
+              },
+              child: Utils.textView(
+                "Next",
+                Get.height * 0.02,
+                CustomColors.white,
+                FontWeight.normal,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
+    ),
+  ),
+);
+
   }
 }
