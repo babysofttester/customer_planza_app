@@ -14,13 +14,19 @@ import 'package:get/get_utils/src/extensions/string_extensions.dart';
 
 // import '../../../../utils/app_fonts.dart';
 
-class ProjectCards extends StatelessWidget {
+class ProjectCards extends StatefulWidget {
   final ProjectsItem item;
 
   const ProjectCards({
     super.key,
     required this.item,
   });
+
+  @override
+  State<ProjectCards> createState() => _ProjectCardsState();
+}
+
+class _ProjectCardsState extends State<ProjectCards> {
 Color _statusColor(String status) {
   final s = status.toLowerCase().trim();
 
@@ -50,13 +56,10 @@ Color _statusColor(String status) {
 }
 
 //payment pending, progress, review pending, completed, incompletd, draft
-
-
-
   @override
   Widget build(BuildContext context) {
-    final statusColor = _statusColor(item.status);
-    final status = item.status.toLowerCase().trim();
+    final statusColor = _statusColor(widget.item.status);
+    final status = widget.item.status.toLowerCase().trim();
  
 
 
@@ -65,15 +68,17 @@ Color _statusColor(String status) {
       if (status == 'draft') {
        
         Get.to(() => AddProject(
-              projectId: item.id, 
+              projectId: widget.item.id, 
             ));
       } else {
         
         Get.to(() => ProjectDetail(
-              projectId: item.id,
+              projectId: widget.item.id, item: widget.item,
             ));
       }
     },
+      
+      
       child: Container(
   padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(
@@ -98,7 +103,7 @@ Color _statusColor(String status) {
             Row(
               children: [
                 Utils.textView(
-                  'Project ID ${item.title}',
+                  'Project ID ${widget.item.title}',
                   Get.width * 0.035,
                   CustomColors.black,
                   FontWeight.w600,
@@ -111,7 +116,7 @@ Color _statusColor(String status) {
             SizedBox(
               width: Get.width * 0.5,
               child: Utils.textViewPro(
-                item.subtitle,
+                widget.item.subtitle,
                 Get.width * 0.035,
                 CustomColors.black,
                 FontWeight.w500,
@@ -135,7 +140,7 @@ Color _statusColor(String status) {
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(
-          item.status.replaceAll('_', ' ').capitalizeFirst ?? '',
+          widget.item.status.replaceAll('_', ' ').capitalizeFirst ?? '',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
@@ -153,6 +158,5 @@ Color _statusColor(String status) {
 
     );
   }
-
 }
 

@@ -155,6 +155,9 @@ class _AddProjectState extends State<AddProject> with TickerProviderStateMixin {
     super.initState();
     controller = Get.put(AddProjectController(this));
     controller.fetchStates();
+  //    if (widget.projectId != null) {
+  //   getProjectDetails(widget.projectId!);
+  // }
   }
 
   final TextEditingController lengthController = TextEditingController();

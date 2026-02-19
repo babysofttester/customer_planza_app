@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:customer_app_planzaa/common/appBar.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/projectController.dart';
 import 'package:customer_app_planzaa/modal/projectmodal.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
@@ -11,11 +12,13 @@ import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 
 class ProjectDetail extends StatefulWidget {
-  final ProjectsItem? item;
+  //final ProjectsItem? item;
+    final ProjectsItem item;
+
   
  final int projectId;
   
-  const ProjectDetail({super.key, this.item, required this.projectId});
+  const ProjectDetail({super.key, required this.item, required this.projectId});
 
   @override
   State<ProjectDetail> createState() => _ProjectDetailState();
@@ -34,8 +37,8 @@ Color _statusColor(String status) {
   }
 }
 
-class _ProjectDetailState extends State<ProjectDetail> {
-  /// 🔑 REQUIRED FOR EXPAND / COLLAPSE
+class _ProjectDetailState extends State<ProjectDetail>  with TickerProviderStateMixin {
+
   final Set<int> _expandedIndexes = {};
 
   final List<File> _uploadedFiles = [];
@@ -151,12 +154,23 @@ class _ProjectDetailState extends State<ProjectDetail> {
     );
   }
 
+
+late ProjectController controller;
+
+@override
+void initState() {
+  super.initState();
+  controller = Get.put(ProjectController(this));
+  controller.getProjectDetails(widget.projectId);
+}
+
+
   @override
   Widget build(BuildContext context) {
     final services =
-        widget.item?.subtitle.split(',').map((e) => e.trim()).toList() ?? [];
+       widget.item.subtitle.split(',').map((e) => e.trim()).toList() ?? [];
 
-    final statusColor = _statusColor(widget.item?.status ?? '');
+    final statusColor = _statusColor(widget.item.status ?? '');
 
     return Scaffold(
       backgroundColor: CustomColors.white,
@@ -177,11 +191,11 @@ class _ProjectDetailState extends State<ProjectDetail> {
                       FontWeight.w500,
                     ),
                     Utils.textView(
-                      widget.item?.title ?? '',
+                      widget.item.title,
                       Get.width * 0.04,
                       CustomColors.black,
                       FontWeight.w600,
-                    ),
+                    ), 
                   ],
                 ),
 
@@ -271,8 +285,8 @@ class _ProjectDetailState extends State<ProjectDetail> {
                           padding: const EdgeInsets.only(bottom: 10),
                           child: _projectRow(
                             title: service,
-                            isCompleted: widget.item?.status == 'Completed',
-                            showDownload: widget.item?.status == 'Completed',
+                            isCompleted: widget.item.status == 'Completed',
+                            showDownload: widget.item.status == 'Completed',
                             isExpanded: _expandedIndexes.contains(index),
                             onArrowTap: () {
                               setState(() {
@@ -335,7 +349,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
-                              widget.item?.status ?? '',
+                              widget.item.status ?? '',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -645,7 +659,7 @@ class _ProjectDetailState extends State<ProjectDetail> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: Image.asset('assets/bgImage.png', fit: BoxFit.cover),
+        child: Image.asset('assets/images/bgImage.png', fit: BoxFit.cover),
       ),
     );
   }

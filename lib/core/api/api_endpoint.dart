@@ -15,4 +15,5 @@ class ApiEndpoints {
   static const designerDetail = "$baseUrl/designer-details";
   static const portfolioDetail = "$baseUrl/get-portfolio-details";
   static const projects = "$baseUrl/projects";
+  static const projectsDetails = "$baseUrl/project-details";
 }
