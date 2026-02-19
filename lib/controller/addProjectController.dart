@@ -7,6 +7,7 @@ import 'package:customer_app_planzaa/common/web_service.dart';
 import 'package:customer_app_planzaa/controller/dsignerController.dart';
 import 'package:customer_app_planzaa/controller/servicecontroller.dart';
 import 'package:customer_app_planzaa/core/api/api_endpoint.dart';
+import 'package:customer_app_planzaa/core/api/api_services.dart';
 import 'package:customer_app_planzaa/core/storage/token_services.dart';
 import 'package:customer_app_planzaa/pages/designerScreen.dart';
 import 'package:flutter/material.dart';
@@ -108,17 +109,24 @@ final ServiceController serviceController = Get.find<ServiceController>();
   final RxnString selectedState = RxnString();
   final RxnString selectedCity = RxnString();
 
- RxList<int> selectedServices = <int>[].obs;
+ //RxList<int> selectedServices = <int>[].obs;
  RxList<int> selectedServiceIds = <int>[].obs;
-
-
-  void toggleService(int serviceId) {
-    if (selectedServices.contains(serviceId)) {
-      selectedServices.remove(serviceId);
-    } else {
-      selectedServices.add(serviceId);
-    }
+void toggleService(int serviceId) {
+  if (selectedServiceIds.contains(serviceId)) {
+    selectedServiceIds.remove(serviceId);
+  } else {
+    selectedServiceIds.add(serviceId);
   }
+}
+
+
+  // void toggleService(int serviceId) {
+  //   if (selectedServices.contains(serviceId)) {
+  //     selectedServices.remove(serviceId);
+  //   } else {
+  //     selectedServices.add(serviceId);
+  //   }
+  // }
 
   Future<void> addProject(
       dynamic state,
@@ -140,6 +148,16 @@ final ServiceController serviceController = Get.find<ServiceController>();
       }
 
       final preparedImages = await _prepareImages();
+// List<int> serviceIds =
+//     serviceController.selectedServiceIds.toList();
+
+//     if (json['project_services'] != null) {
+//   serviceIds = List<int>.from(
+//     json['project_services'].map((e) => e['id'])
+//   );
+// }
+
+    print("SELECTED BEFORE API: $selectedServiceIds");
 
       final body = {
         "state": state,
@@ -152,7 +170,9 @@ final ServiceController serviceController = Get.find<ServiceController>();
         "images": preparedImages,
         //"services": selectedServices, 
        // "services": selectedServices.toList(),
-        "services": serviceController.selectedServiceIds.toList(),
+       // "services": serviceController.selectedServiceIds.toList(),
+       
+ "services": selectedServiceIds.toList(),
 
 
       };
@@ -175,7 +195,7 @@ final ServiceController serviceController = Get.find<ServiceController>();
       print("LAT: $latitude");
       print("LONG: $longitude");
       print("IMAGES COUNT: ${images.length}");
-      print("SERVICES: ${selectedServices.toList()}");
+      print("SERVICES: ${selectedServiceIds.toList()}");
 
 print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
@@ -359,6 +379,7 @@ Future<void> fetchCities(String state) async {
    // method: HttpMethod.post, // if required
   );
 }
+
 
 
 }

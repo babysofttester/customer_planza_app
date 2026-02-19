@@ -69,6 +69,7 @@ Color _statusColor(String status) {
        
         Get.to(() => AddProject(
               projectId: widget.item.id, 
+               serviceIds: widget.item.selectedServiceIds,
             ));
       } else {
         

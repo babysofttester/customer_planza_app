@@ -4,11 +4,16 @@ class ProjectsItem {
   final String subtitle;
   final String status;
 
+  List<int> selectedServiceIds = [];
+
+
   ProjectsItem({
     required this.id,
     required this.title,
     required this.subtitle,
     required this.status,
+
+    
   });
 
   factory ProjectsItem.fromJson(Map<String, dynamic> json) {

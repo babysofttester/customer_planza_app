@@ -64,36 +64,38 @@ ProjectDetailResponseModel? projectDetailModel;
 
 
 
-  Future<void> getProjectDetails(int projectId) async {
-     print("API CALLED WITH ID: $projectId"); 
-    try {
-        _tickerProvider;
-     // isLoading.value = true;
+//   Future<void> getProjectDetails(int projectId) async {
+//      print("API CALLED WITH ID: $projectId"); 
+//     try {
+//         _tickerProvider;
+//      // isLoading.value = true;
 
-      final token = await TokenService.getToken();
+//       final token = await TokenService.getToken();
 
-      final response = await http.post(
-        Uri.parse(ApiEndpoints.projectsDetails),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-        body: {
-          "project_id": projectId.toString(),
-        },
-      );
+//       final response = await http.post(
+//         Uri.parse(ApiEndpoints.projectsDetails),
+//         headers: {
+//           "Authorization": "Bearer $token",
+//           "Accept": "application/json",
+//         },
+//         body: {
+//           "project_id": projectId.toString(),
+//         },
+//       );
 
-      if (response.statusCode == 200) {
-        print(response.statusCode);
-print(response.body);
+//       if (response.statusCode == 200) {
+//         print(response.statusCode);
+// print(response.body);
 
-        final data = jsonDecode(response.body);
-        projectDetailModel = ProjectDetailResponseModel.fromJson(data);
-        update(); 
-      }
-    } catch (e) {
-      print("Project Detail Error: $e");
-    } finally {
-    }
-  }
+//         final data = jsonDecode(response.body);
+//         projectDetailModel = ProjectDetailResponseModel.fromJson(data);
+//         update(); 
+//       }
+//     } catch (e) {
+//       print("Project Detail Error: $e");
+//     } finally {
+//     }
+//   }
+
+
 }

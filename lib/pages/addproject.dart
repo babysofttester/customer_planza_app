@@ -22,7 +22,8 @@ import '../controller/addProjectController.dart';
 
 class AddProject extends StatefulWidget {
    final int projectId;
-  const AddProject({super.key, required this.projectId});
+     final List<int> serviceIds;
+  const AddProject({super.key, required this.projectId, required this.serviceIds,});
 
   @override
   State<AddProject> createState() => _AddProjectState();
@@ -155,9 +156,14 @@ class _AddProjectState extends State<AddProject> with TickerProviderStateMixin {
     super.initState();
     controller = Get.put(AddProjectController(this));
     controller.fetchStates();
-  //    if (widget.projectId != null) {
-  //   getProjectDetails(widget.projectId!);
-  // }
+      // 👇 AUTO SELECT SERVICES
+  controller.selectedServiceIds
+      .assignAll(widget.serviceIds);
+
+  print("AUTO LOADED SERVICES: ${widget.serviceIds}");
+  print("SERVICES: ${controller.selectedServiceIds.toList()}");
+
+  
   }
 
   final TextEditingController lengthController = TextEditingController();

@@ -75,7 +75,7 @@ class _ServiceScreenState extends State<ServiceScreen>
                 //  showDialog(
                 //       context: context,
                 //       barrierDismissible: true,
-                //       builder: (_) => const ArchitectPopup(),
+                //       builder: (_) => const ArchitectPopup(projectId: ,),
                 //     );
               },
               child: Utils.textView(
