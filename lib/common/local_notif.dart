@@ -13,7 +13,7 @@ void initializeNotifications() {
   );
 
   flutterLocalNotificationsPlugin.initialize(
-  /*   settings: */ initializationSettings, // <--- named parameter required
+   /*  settings: */  initializationSettings, // <--- named parameter required
     onDidReceiveNotificationResponse: (NotificationResponse response) {
       // Handle notification tap
       print('Notification tapped with payload: ${response.payload}');

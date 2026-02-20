@@ -3,29 +3,34 @@
 
 import 'dart:convert';
 
+import 'package:customer_app_planzaa/common/constants.dart';
+import 'package:customer_app_planzaa/common/load_manager.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/common/web_service.dart';
 import 'package:customer_app_planzaa/core/api/api_endpoint.dart';
-import 'package:customer_app_planzaa/core/storage/token_services.dart';
 import 'package:customer_app_planzaa/modal/project_detail_response_model.dart';
-import 'package:customer_app_planzaa/modal/projectmodal.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProjectDetailController extends GetxController {
     final TickerProvider _tickerProvider;
-    
-  ProjectDetailController(this._tickerProvider);
+    int projectId;
 
+  ProjectDetailController(this._tickerProvider, this.projectId );
 
-ProjectDetailResponseModel? projectDetailModel;
-
-
-Future<void> getProjectDetails(int projectId) async {
+  Rx<ProjectDetailResponseModel> projectDetailModel =
+      ProjectDetailResponseModel().obs;
+ late SharedPreferences prefs;
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    prefs = await SharedPreferences.getInstance();
+    await getProjectDetails(projectId.toString());
+  }
+/* 
+Future<void> getProjectDetails() async {
   print("API CALLED WITH ID: $projectId");
 
   try {
@@ -78,5 +83,45 @@ try {
     Utils.showToast("Something went wrong");
   }
 }
+
+ */
+
+  getProjectDetails(String pID) {
+    Utils.print("pID:: $pID");
+
+    var authToken = prefs.getString(Constants.AUTH_TOKEN);
+
+    Utils.print("auth token: $authToken");
+    Map<String, String> data = {
+      "project_id": pID,
+    };
+
+    callWebApi( _tickerProvider,   ApiEndpoints.projectsDetails, data,
+        onResponse: (http.Response response) async {
+      var responseJson = jsonDecode(response.body);
+
+      try {
+        projectDetailModel.value =
+            ProjectDetailResponseModel.fromJson(responseJson);
+
+        projectDetailModel.value.message == null ||
+                projectDetailModel.value.message == ""
+            ? const SizedBox()
+            : Utils.showToast(
+                "${projectDetailModel.value.message}");
+        // gotPropertyDetailData.value = true;
+        // gotPropertyDetailDataBU.value = true;
+        LoaderManager.hideLoader();
+      } catch (e) {
+        e.printError();
+        e.printInfo();
+        LoaderManager.hideLoader();
+        Utils.print(e.toString());
+      }
+      // loading.value = false;
+      Utils.print("project detail page %%%%%%%%%%%%%%%%%%%% ");
+    }, token: authToken);
+  }
+
 
 }

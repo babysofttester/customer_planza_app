@@ -1,24 +1,504 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:customer_app_planzaa/common/appBar.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
-import 'package:customer_app_planzaa/controller/projectController.dart';
+import 'package:customer_app_planzaa/controller/projectDetailController.dart';
+// import 'package:customer_app_planzaa/services/zego_service.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
+import 'package:zego_zimkit/zego_zimkit.dart';
+
+class ProjectDetail extends StatefulWidget {
+  final int projectId;
+
+  const ProjectDetail({super.key, required this.projectId});
+
+  @override
+  State<ProjectDetail> createState() => _ProjectDetailState();
+}
+
+Color _statusColor(String status) {
+  switch (status.toLowerCase()) {
+    case 'completed':
+      return const Color(0xFF53AC40);
+    case 'in progress':
+    case 'pending':
+      return const Color(0xFF6F67C5);
+    default:
+      return Colors.grey;
+  }
+}
+
+class _ProjectDetailState extends State<ProjectDetail>
+    with TickerProviderStateMixin {
+  final Set<int> _expandedIndexes = {};
+  // final List<File> _uploadedFiles = [];
+  // final List<String> _uploadedFileNames = [];
+
+  late ProjectDetailController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(
+      ProjectDetailController(this, widget.projectId),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: CustomColors.white,
+      appBar: const CustomAppBar(title: "Project Detail"),
+      body: Obx(() {
+        final model = controller.projectDetailModel.value;
+
+        if (model.data == null || model.data!.result == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final result = model.data!.result!;
+        final services = result.services ?? [];
+        final status = services.isNotEmpty ? services.first.status ?? "" : "";
+        final statusColor = _statusColor(status);
+
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              children: [
+                /// PROJECT ID
+                Row(
+                  children: [
+                    Utils.textView(
+                      'Project ID ',
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w500,
+                    ),
+                    Utils.textView(
+                      result.projectId?.toString() ?? "",
+                      Get.width * 0.04,
+                      CustomColors.black,
+                      FontWeight.w600,
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: Get.height * 0.02),
+
+                /// ================= DESIGNER CARD =================
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: _cardDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// HEADER
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Utils.textView(
+                                result.designer?.name ?? "",
+                                Get.width * 0.04,
+                                CustomColors.black,
+                                FontWeight.w500,
+                              ),
+                              Utils.textView(
+                                "Booking No: ${result.designer?.bookingNo ?? ""}",
+                                Get.width * 0.035,
+                                CustomColors.black,
+                                FontWeight.w400,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              ///  CHAT BUTTON
+                              GestureDetector(
+                                onTap: () => _startChat(),
+                                child: const Icon(
+                                  Icons.chat_outlined,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+
+                              /// 📞 CALL BUTTON
+                              GestureDetector(
+                                onTap: () => _startCall(),
+                                child: const Icon(
+                                  Icons.phone_outlined,
+                                  size: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          /// CALL BUTTON
+                          // GestureDetector(
+                          //   onTap: () => _startCall(),
+                          //   child: const Icon(
+                          //     Icons.phone_outlined,
+                          //     size: 20,
+                          //   ),
+                          // ),
+                        ],
+                      ),
+
+                      Divider(height: Get.height * 0.03),
+
+                      const Text("Services"),
+
+                      const SizedBox(height: 10),
+
+                      /// SERVICES LIST
+                      ...services.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final service = entry.value;
+                        final isCompleted =
+                            service.status?.toLowerCase() == "completed";
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _projectRow(
+                            title: service.serviceName ?? "",
+                            isCompleted: isCompleted,
+                            isExpanded: _expandedIndexes.contains(index),
+                            onArrowTap: () {
+                              setState(() {
+                                _expandedIndexes.contains(index)
+                                    ? _expandedIndexes.remove(index)
+                                    : _expandedIndexes.add(index);
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// ================= SURVEYOR CARD =================
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: _cardDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(result.surveyor?.name ?? ""),
+                              Text(
+                                "Booking No: ${result.surveyor?.bookingNo ?? ""}",
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              status,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Divider(height: Get.height * 0.03),
+                      const Text("Plot Detail"),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Text("Length : "),
+                          Text(result.surveyor?.workDetail?.length ?? ""),
+                          const SizedBox(width: 40),
+                          const Text("Breadth : "),
+                          Text(result.surveyor?.workDetail?.breath ?? ""),
+                        ],
+                      ),
+                      Divider(height: Get.height * 0.03),
+                      const Text("Description"),
+                      const SizedBox(height: 6),
+                      Text(result.surveyor?.workDetail?.description ?? ""),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  /// ================= SERVICE ROW =================
+  Widget _projectRow({
+    required String title,
+    required bool isCompleted,
+    required bool isExpanded,
+    required VoidCallback onArrowTap,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F7F7),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Expanded(child: Text(title)),
+              Icon(
+                isCompleted ? Icons.check_circle : Icons.check_circle_outline,
+                color: isCompleted ? Colors.green : Colors.orange,
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: onArrowTap,
+                child: Icon(
+                  isExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isExpanded)
+          const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: Text("Submissions coming soon..."),
+          ),
+      ],
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.15),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
+
+/*   /// ================= START CHAT =================
+  Future<void> _startChat() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final currentUserID = prefs.getString("user_id");
+    final currentUserName = prefs.getString("user_name");
+
+    if (currentUserID == null) {
+      Get.snackbar("Error", "User not logged in");
+      return;
+    }
+
+    final result = controller.projectDetailModel.value.data?.result;
+
+    final targetUserID =
+        result?.designer?.id?.toString(); //   hardcoded 5
+    final targetUserName = result?.designer?.name ?? "Designer";
+
+    if (targetUserID == null || targetUserID.isEmpty) {
+      Get.snackbar("Error", "Designer not found");
+      return;
+    }
+
+    log("===== CHAT OPEN =====");
+    log("Current User: $currentUserID");
+    log("Target User: $targetUserID");
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ZIMKitMessageListPage(
+          conversationID: targetUserID,
+          conversationType: ZIMConversationType.peer,
+
+          ///  Custom AppBar with Call Button
+          appBarBuilder: (context, defaultAppBar) {
+            return AppBar(
+              title: Text(targetUserName),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.call),
+                  onPressed: () {
+                    ///  Voice Call
+                    ZegoUIKitPrebuiltCallInvitationService().send(
+                      isVideoCall: false,
+                      invitees: [
+                        ZegoCallUser(
+                          targetUserID,
+                          targetUserName,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+             ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+ */
+
+  Future<void> _startChat() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final currentUserID = prefs.getString("user_id");
+    final currentUserName = prefs.getString("user_name");
+
+    if (currentUserID == null) {
+      Get.snackbar("Error", "User not logged in");
+      return;
+    }
+
+    final result = controller.projectDetailModel.value.data?.result;
+
+    final designerID = result?.designer?.id?.toString();
+    final designerName = result?.designer?.name ?? "Designer";
+
+    if (designerID == null || designerID.isEmpty) {
+      Get.snackbar("Error", "Designer not found");
+      return;
+    }
+
+    ///  Create unique room id
+    final roomID = "${currentUserID}_$designerID";
+    final roomName = "${currentUserName}_$designerName";
+    log("===== GROUP CHAT OPEN =====");
+    log("Room ID: $roomID");
+
+    try {
+      await ZIMKit().createGroup(
+        roomName, // group name
+        [designerID], // invite list (must be List<String>)
+        id: roomID, //  custom group ID
+      );
+    } catch (e) {
+      log("Group may already exist: $e");
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ZIMKitMessageListPage(
+          conversationID: roomID,
+          conversationType: ZIMConversationType.group,
+          appBarBuilder: (context, defaultAppBar) {
+            return AppBar(
+              title: Text(designerName),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.call),
+                  onPressed: () {
+                    ZegoUIKitPrebuiltCallInvitationService().send(
+                      isVideoCall: false,
+                      invitees: [
+                        ZegoCallUser(designerID, designerName),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// ================= START CALL =================
+  Future<void> _startCall() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final currentUserID = prefs.getString("user_id");
+    final currentUserName = prefs.getString("user_name");
+
+    if (currentUserID == null || currentUserName == null) {
+      Get.snackbar("Error", "User not logged in");
+      return;
+    }
+
+    final result = controller.projectDetailModel.value.data?.result;
+    final targetUserID = result?.designer?.id?.toString();
+    final targetUserName = result?.designer?.name ?? "Designer";
+
+    if (targetUserID == null || targetUserID.isEmpty) {
+      Get.snackbar("Error", "Designer not found");
+      return;
+    }
+
+    log("===== CALL INVITATION =====");
+    log("Caller: $currentUserID");
+    log("Callee: $targetUserID");
+
+    ZegoUIKitPrebuiltCallInvitationService().send(
+      isVideoCall: false,
+      invitees: [
+        ZegoCallUser(
+          targetUserID,
+          targetUserName,
+        ),
+      ],
+    );
+  }
+}
+
+
+
+
+/* import 'dart:io';
+
+import 'package:customer_app_planzaa/common/appBar.dart';
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/projectDetailController.dart';
 import 'package:customer_app_planzaa/modal/projectmodal.dart';
+import 'package:customer_app_planzaa/services/zego_service.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+// import 'package:customer_app_planzaa/services/zego_service.dart';
 
 class ProjectDetail extends StatefulWidget {
-  //final ProjectsItem? item;
-    final ProjectsItem item;
+  final int projectId;
 
-  
- final int projectId;
-  
-  const ProjectDetail({super.key, required this.item, required this.projectId});
+  const ProjectDetail({super.key, required this.projectId});
 
   @override
   State<ProjectDetail> createState() => _ProjectDetailState();
@@ -37,12 +517,28 @@ Color _statusColor(String status) {
   }
 }
 
-class _ProjectDetailState extends State<ProjectDetail>  with TickerProviderStateMixin {
-
+class _ProjectDetailState extends State<ProjectDetail>
+    with TickerProviderStateMixin {
   final Set<int> _expandedIndexes = {};
 
   final List<File> _uploadedFiles = [];
   final List<String> _uploadedFileNames = [];
+
+  late ProjectDetailController projectsDetailController;
+
+  @override
+  void initState() {
+    super.initState();
+    projectsDetailController = Get.put(
+      ProjectDetailController(this, widget.projectId),
+    );
+  }
+
+  @override
+  void dispose() {
+    projectsDetailController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -154,23 +650,12 @@ class _ProjectDetailState extends State<ProjectDetail>  with TickerProviderState
     );
   }
 
-
-late ProjectController controller;
-
-@override
-void initState() {
-  super.initState();
-  controller = Get.put(ProjectController(this));
-  controller.getProjectDetails(widget.projectId);
-}
-
-
   @override
   Widget build(BuildContext context) {
-    final services =
-       widget.item.subtitle.split(',').map((e) => e.trim()).toList() ?? [];
+    // final services =
+    //    projectsDetailController.projectDetailModel.value .item.subtitle.split(',').map((e) => e.trim()).toList() ?? [];
 
-    final statusColor = _statusColor(widget.item.status ?? '');
+    // final statusColor = _statusColor(widget.item.status ?? '');
 
     return Scaffold(
       backgroundColor: CustomColors.white,
@@ -191,11 +676,18 @@ void initState() {
                       FontWeight.w500,
                     ),
                     Utils.textView(
-                      widget.item.title,
+                      projectsDetailController
+                          .projectDetailModel
+                          .value
+                          .data!
+                          .result!
+                          .projectId
+                          .toString(),
+                      // widget.item.title,
                       Get.width * 0.04,
                       CustomColors.black,
                       FontWeight.w600,
-                    ), 
+                    ),
                   ],
                 ),
 
@@ -226,22 +718,22 @@ void initState() {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Utils.textView(
-                      'Adam Collins',
-                      Get.width * 0.04,
-                      CustomColors.black,
-                      FontWeight.w500,
-                    ),
+                              Utils.textView(
+                                'Adam Collins',
+                                Get.width * 0.04,
+                                CustomColors.black,
+                                FontWeight.w500,
+                              ),
                               // Text(
                               //   'Adam Collins',
                               //   // style: AppFonts.proMainHeading()
                               // ),
-                               Utils.textView(
-                      'Job ID: JP-43821',
-                      Get.width * 0.04,
-                      CustomColors.black,
-                      FontWeight.w500,
-                    ),
+                              Utils.textView(
+                                'Job ID: JP-43821',
+                                Get.width * 0.04,
+                                CustomColors.black,
+                                FontWeight.w500,
+                              ),
                               // Text(
                               //   'Job ID: JP-43821',
                               //   // style: AppFonts.payment1()
@@ -249,17 +741,25 @@ void initState() {
                             ],
                           ),
                           Row(
-                            children: const [
-                              Icon(
-                                Icons.chat_outlined,
-                                size: 18,
-                                //  color: AppColors.primary
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  // Optional: open chat page
+                                },
+                                child: const Icon(
+                                  Icons.chat_outlined,
+                                  size: 18,
+                                ),
                               ),
-                              SizedBox(width: 8),
-                              Icon(
-                                Icons.phone_outlined,
-                                size: 18,
-                                // color: AppColors.primary
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _startCall();
+                                },
+                                child: const Icon(
+                                  Icons.phone_outlined,
+                                  size: 18,
+                                ),
                               ),
                             ],
                           ),
@@ -606,15 +1106,9 @@ void initState() {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _uploadedFileNames[index],
-                            // style: AppFonts.payment(size: 14),
-                          ),
+                          Text(_uploadedFileNames[index]),
                           const SizedBox(height: 4),
-                          Text(
-                            "Tap to view",
-                            // style: AppFonts.payment1(size: 12),
-                          ),
+                          Text("Tap to view"),
                         ],
                       ),
 
@@ -626,16 +1120,6 @@ void initState() {
                             },
                             child: const Text("View"),
                           ),
-
-                          // IconButton(
-                          //                           //   icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          //                           //   onPressed: () {
-                          //                           //     setState(() {
-                          //                           //       _uploadedFiles.removeAt(index);
-                          //                           //       _uploadedFileNames.removeAt(index);
-                          //                           //     });
-                          //                           //   },
-                          //                           // ),
                         ],
                       ),
                     ],
@@ -663,4 +1147,43 @@ void initState() {
       ),
     );
   }
+
+  Future<void> _startCall() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final currentUserID = prefs.getString("user_id");
+    final currentUserName = prefs.getString("user_name");
+
+    if (currentUserID == null || currentUserName == null) {
+      Get.snackbar("Error", "User not logged in");
+      return;
+    }
+
+    /// 🔹 This should come from your API
+    /// For example:
+    /// widget.item.designerId
+    final String targetUserID = widget.item.designerId.toString();
+
+    /// Generate unique call ID
+    final String callID =
+        "${currentUserID}_$targetUserID_${DateTime.now().millisecondsSinceEpoch}";
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ZegoUIKitPrebuiltCall(
+            appID: ZegoService.appID,
+            appSign: ZegoService.appSign,
+            userID: currentUserID,
+            userName: currentUserName,
+            callID: callID,
+            config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
+              ..invitees = [ZegoUIKitUser(id: targetUserID, name: "Designer")],
+          );
+        },
+      ),
+    );
+  }
 }
+ */

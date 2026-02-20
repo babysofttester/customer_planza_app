@@ -74,7 +74,7 @@ Color _statusColor(String status) {
       } else {
         
         Get.to(() => ProjectDetail(
-              projectId: widget.item.id, item: widget.item,
+              projectId: widget.item.id, /* item: widget.item, */
             ));
       }
     },

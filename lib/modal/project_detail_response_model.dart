@@ -46,7 +46,7 @@ class Data {
 }
 
 class Result {
-  int? projectId;
+  String? projectId;
   String? projectNumber;
   Designer? designer;
   List<Services>? services;
@@ -119,10 +119,10 @@ class Designer {
 }
 
 class Services {
-  int? serviceId;
+  String? serviceId;
   String? serviceName;
   String? status;
-  List<dynamic>? submissions;
+  List<Submissions>? submissions;
 
   Services({this.serviceId, this.serviceName, this.status, this.submissions});
 
@@ -130,15 +130,59 @@ class Services {
     serviceId = json['service_id'];
     serviceName = json['service_name'];
     status = json['status'];
-    submissions = json['submissions'];
+    if (json['submissions'] != null) {
+      submissions = <Submissions>[];
+      json['submissions'].forEach((v) {
+        submissions!.add(new Submissions.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {};
-    data['service_id'] = serviceId;
-    data['service_name'] = serviceName;
-    data['status'] = status;
-    data['submissions'] = submissions;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['service_id'] = this.serviceId;
+    data['service_name'] = this.serviceName;
+    data['status'] = this.status;
+    if (this.submissions != null) {
+      data['submissions'] = this.submissions!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Submissions {
+  String? submissionId;
+  String? userType;
+  String? userId;
+  String? title;
+  String? description;
+  List<String>? files;
+
+  Submissions(
+      {this.submissionId,
+      this.userType,
+      this.userId,
+      this.title,
+      this.description,
+      this.files});
+
+  Submissions.fromJson(Map<String, dynamic> json) {
+    submissionId = json['submission_id'];
+    userType = json['user_type'];
+    userId = json['user_id'];
+    title = json['title'];
+    description = json['description'];
+    files = json['files'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['submission_id'] = this.submissionId;
+    data['user_type'] = this.userType;
+    data['user_id'] = this.userId;
+    data['title'] = this.title;
+    data['description'] = this.description;
+    data['files'] = this.files;
     return data;
   }
 }
@@ -148,94 +192,75 @@ class Surveyor {
   String? bookingNo;
   String? name;
   WorkDetail? workDetail;
-  List<dynamic>? files;
+  List<String>? files;
   ProjectData? projectData;
 
-  Surveyor({
-    this.id,
-    this.bookingNo,
-    this.name,
-    this.workDetail,
-    this.files,
-    this.projectData,
-  });
+  Surveyor(
+      {this.id,
+      this.bookingNo,
+      this.name,
+      this.workDetail,
+      this.files,
+      this.projectData});
 
   Surveyor.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     bookingNo = json['booking_no'];
     name = json['name'];
-
     workDetail = json['work_detail'] != null
-        ? WorkDetail.fromJson(json['work_detail'])
+        ? new WorkDetail.fromJson(json['work_detail'])
         : null;
-
-    files = json['files'];   // ✅ simple direct assign
-
+    files = json['files'].cast<String>();
     projectData = json['projectData'] != null
-        ? ProjectData.fromJson(json['projectData'])
+        ? new ProjectData.fromJson(json['projectData'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {};
-
-    data['id'] = id;
-    data['booking_no'] = bookingNo;
-    data['name'] = name;
-
-    if (workDetail != null) {
-      data['work_detail'] = workDetail!.toJson();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['booking_no'] = this.bookingNo;
+    data['name'] = this.name;
+    if (this.workDetail != null) {
+      data['work_detail'] = this.workDetail!.toJson();
     }
-
-    data['files'] = files;  // ✅ no map(), no toJson()
-
-    if (projectData != null) {
-      data['projectData'] = projectData!.toJson();
+    data['files'] = this.files;
+    if (this.projectData != null) {
+      data['projectData'] = this.projectData!.toJson();
     }
-
     return data;
   }
 }
 
-
-
 class WorkDetail {
-  double? length;
-  double? breadth;
+  String? length;
+  String? breath;
   String? description;
 
-  WorkDetail({this.length, this.breadth, this.description});
+  WorkDetail({this.length, this.breath, this.description});
 
   WorkDetail.fromJson(Map<String, dynamic> json) {
-    length = _parseDouble(json['length']);
-    breadth = _parseDouble(json['breath']); 
+    length = json['length'];
+    breath = json['breath'];
     description = json['description'];
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'length': length,
-      'breath': breadth,
-      'description': description,
-    };
-  }
-
-
-  double? _parseDouble(dynamic value) {
-    if (value == null || value == '') return null;
-    if (value is int) return value.toDouble();
-    if (value is double) return value;
-    return double.tryParse(value.toString());
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['length'] = this.length;
+    data['breath'] = this.breath;
+    data['description'] = this.description;
+    return data;
   }
 }
 
 class ProjectData {
-  int? projectId;
+  String? projectId;
   String? state;
   String? city;
-  int? floor;
-  double? length;
-  double? breadth;
+  String? floor;
+  String? length;
+  String? breadth;
   String? projectLat;
   String? projectLng;
   List<ProjectImages>? projectImages;
@@ -299,7 +324,7 @@ class ProjectData {
 }
 
 class ProjectImages {
-  int? id;
+  String? id;
   String? file;
 
   ProjectImages({this.id, this.file});
@@ -318,7 +343,7 @@ class ProjectImages {
 }
 
 class ProjectServices {
-  int? id;
+  String? id;
 
   ProjectServices({this.id});
 

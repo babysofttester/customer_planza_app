@@ -5,7 +5,6 @@ import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/common/web_service.dart';
 import 'package:customer_app_planzaa/modal/sign_in_response_model.dart';
 import 'package:customer_app_planzaa/pages/otp_verify.dart';
-import 'package:customer_app_planzaa/pages/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';

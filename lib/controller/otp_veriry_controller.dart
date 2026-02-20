@@ -8,6 +8,7 @@ import 'package:customer_app_planzaa/common/web_service.dart' as api;
 import 'package:customer_app_planzaa/modal/login_response_model.dart';
 import 'package:customer_app_planzaa/modal/sign_in_response_model.dart';
 import 'package:customer_app_planzaa/pages/home.dart';
+import 'package:customer_app_planzaa/services/zego_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -192,23 +193,29 @@ class OtpVerifyController extends GetxController {
       onResponse: (response) async {
         Utils.print("response:: $response");
 
-       var responseJson = response.body is String
-    ? jsonDecode(response.body)
-    : response.body;
+        var responseJson =
+            jsonDecode(response.body);
 
-String jsonString = jsonEncode(responseJson);
+        String jsonString = jsonEncode(responseJson);
 
-        int statusCode =response.statusCode;
+        int statusCode = response.statusCode;
         if (kDebugMode) {
           print("statusCode::::: $statusCode");
         }
-        if (statusCode == 200) {
+        /*  if (statusCode == 200) {
           try {
             Constants.loginResponseModel = LoginResponseModel.fromJson(
               responseJson,
             );
+
+            final userId = prefs.getString("user_id")!;
+            final userName = prefs.getString("user_name")!;
+
+            ZegoService.init(userID: userId, userName: userName);
+
             prefs.setInt(Constants.IS_LOGGED_IN, 1);
             prefs.setString(Constants.KEY_LOGIN_RESPONSE, jsonString);
+
             String? abcd = prefs.getString(Constants.KEY_LOGIN_RESPONSE);
 
             Constants.loginResponseModel = LoginResponseModel.fromJson(
@@ -245,7 +252,7 @@ String jsonString = jsonEncode(responseJson);
                 : const SizedBox();
 
             prefs.setString(Constants.KEY_USER_NAME, email);
-            Get.offAll(()=> Home());
+            Get.offAll(() => Home());
           } catch (e) {
             e.printError();
             e.printInfo();
@@ -263,6 +270,48 @@ String jsonString = jsonEncode(responseJson);
 
           prefs.setInt(Constants.IS_LOGGED_IN, 1);
           prefs.setString(Constants.KEY_LOGIN_RESPONSE, jsonString);
+        } */
+        if (statusCode == 200) {
+          try {
+            final loginModel = LoginResponseModel.fromJson(responseJson);
+
+            final userId = loginModel.data!.customer!.id.toString();
+            final userName = loginModel.data!.customer!.name ?? "User";
+
+            /// ✅ SAVE DATA FIRST
+            await prefs.setInt(Constants.IS_LOGGED_IN, 1);
+            await prefs.setString(Constants.KEY_LOGIN_RESPONSE, jsonString);
+
+            await prefs.setString('user_id', userId);
+            await prefs.setString('user_name', userName);
+            await prefs.setString(
+                Constants.AUTH_TOKEN, loginModel.data!.token!);
+
+            // /// ✅ THEN INIT ZEGO
+            // await ZegoService.init(
+            //   userID: userId,
+            //   userName: userName,
+            // );
+            final isSuccess = await ZegoService.login(
+              userID: userId,
+              userName: userName,
+            );
+
+            if (!isSuccess) {
+              Get.snackbar("Error", "Chat login failed");
+              return;
+            }
+
+            /// Optional success toast
+            if (loginModel.message != null && loginModel.message!.isNotEmpty) {
+              Utils.showToast(loginModel.message!);
+            }
+
+            /// ✅ Navigate after Zego ready
+            Get.offAll(() => Home());
+          } catch (e) {
+            print("Login parsing error: $e");
+          }
         } else {
           Utils.print(responseJson['statusCode']);
           Utils.print(responseJson['statusCode']);
@@ -272,5 +321,4 @@ String jsonString = jsonEncode(responseJson);
       token: "",
     );
   }
-
 }

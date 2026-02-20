@@ -62,7 +62,7 @@ class _ProjectPageState extends State<ProjectPage> with TickerProviderStateMixin
                 padding: const EdgeInsets.only(bottom: 8),
                 child: GestureDetector(
                   onTap: () {
-                    Get.to(()=>ProjectDetail(item: project, projectId: project.id,));
+                    Get.to(()=>ProjectDetail(/* item: project, */ projectId: project.id,));
                     // Get.find<BottomNavController>().openInner(
                     //   page: ProjectDetail(item: project),
                     //   title: "Project Details",
