@@ -98,21 +98,21 @@ _tickerProvider;
 
 
 
- 
-  // Selection logic
-void toggleSelection(int index) {
-  final id = services[index].id ?? 0;
 
-  if (selectedServiceIds.contains(id)) {
-    selectedServiceIds.remove(id);
+  // Selection logic
+void toggleSelection(int serviceId) {
+  if (selectedServiceIds.contains(serviceId)) {
+    selectedServiceIds.remove(serviceId);
   } else {
-    selectedServiceIds.add(id);
+    selectedServiceIds.add(serviceId);
   }
 }
+  bool isSelected(int serviceId) {
+  return selectedServiceIds.contains(serviceId);
+}
 
-
-  bool isSelected(int index) {
-    return selectedServiceIds.contains(services[index].id);
-  }
+  // bool isSelected(int index) {
+  //   return selectedServiceIds.contains(services[index].id);
+  // }
   
 }

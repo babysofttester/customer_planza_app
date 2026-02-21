@@ -3,31 +3,34 @@ class ProjectsItem {
   final String title;
   final String subtitle;
   final String status;
-
-  List<int> selectedServiceIds = [];
-
+  final List<int> selectedServiceIds;
 
   ProjectsItem({
     required this.id,
     required this.title,
     required this.subtitle,
     required this.status,
-
-    
+    required this.selectedServiceIds,
   });
 
   factory ProjectsItem.fromJson(Map<String, dynamic> json) {
+    final services = json['services'] as List? ?? [];
+
     return ProjectsItem(
-      // id: json['project_id']?.toString() ?? '',
       id: json['project_id'] ?? 0,
 
       title: json['project_number']?.toString() ?? '',
-      subtitle: (json['services'] as List?)
-         ?.map((e) => e['name'].toString())
-          .join(', ') ??
-          'No Services',
+
+      subtitle: services
+          .map((e) => e['name'].toString())
+          .join(', '),
+
       status: json['project_status']?.toString() ?? '',
+
+      // ✅ THIS WAS MISSING
+      selectedServiceIds: services
+          .map<int>((e) => e['id'] as int)
+          .toList(),
     );
   }
 }
-

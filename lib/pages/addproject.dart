@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:customer_app_planzaa/common/appBar.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/servicecontroller.dart';
 import 'package:customer_app_planzaa/custom_widgets/map_picker.dart';
 import 'package:customer_app_planzaa/custom_widgets/searchabledropdown.dart';
 import 'package:flutter/material.dart';
@@ -151,21 +152,64 @@ class _AddProjectState extends State<AddProject> with TickerProviderStateMixin {
 
   //final AddProjectController controller;
   late AddProjectController controller;
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.put(AddProjectController(this));
-    controller.fetchStates();
-      // 👇 AUTO SELECT SERVICES
-  controller.selectedServiceIds
-      .assignAll(widget.serviceIds);
+  //final ServiceController serviceController = Get.find<ServiceController>();
+  //final ServiceController serviceController = Get.put(ServiceController());
 
-  print("AUTO LOADED SERVICES: ${widget.serviceIds}");
-  print("SERVICES: ${controller.selectedServiceIds.toList()}");
 
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller = Get.put(AddProjectController(this));
+  //   controller.fetchStates();
+   
+  // serviceController = Get.put(ServiceController(context));
+   
+  // serviceController.selectedServiceIds.assignAll(widget.serviceIds);
+
+  // print("AUTO LOADED SERVICES: ${widget.serviceIds}");
+  // print("SERVICES: ${serviceController.selectedServiceIds.toList()}");
   
-  }
+  // }
 
+late ServiceController serviceController;
+
+
+// @override
+// void initState() {
+//   super.initState();
+ 
+//   controller = Get.put(AddProjectController(this));
+//  serviceController = Get.find<ServiceController>();
+
+//    // Directly assign here
+//   serviceController.selectedServiceIds.assignAll(widget.serviceIds);
+//   print("WIDGET SERVICES RECEIVED: ${widget.serviceIds}");
+
+// //   WidgetsBinding.instance.addPostFrameCallback((_) {
+// //     serviceController.selectedServiceIds.assignAll(widget.serviceIds);
+// //     print(serviceController.hashCode);
+// // print(Get.find<ServiceController>().hashCode);
+
+// // print("WIDGET SERVICES RECEIVED: ${widget.serviceIds}");
+
+
+// //   });
+// }
+
+@override
+void initState() {
+  super.initState();
+
+  controller = Get.put(AddProjectController(this));
+  serviceController = Get.find<ServiceController>();
+ 
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    serviceController.selectedServiceIds.assignAll(widget.serviceIds);
+    print('project_id: ${widget.projectId}');
+    print("WIDGET SERVICES RECEIVED: ${widget.serviceIds}");
+  });
+}
   final TextEditingController lengthController = TextEditingController();
   final TextEditingController breadthController = TextEditingController();
   final TextEditingController latitudeController = TextEditingController();
@@ -569,34 +613,64 @@ class _AddProjectState extends State<AddProject> with TickerProviderStateMixin {
                         //   );
                         //
                         // },
-                        onPressed: () {
-                          if (controller.selectedState.value == null ||
-                              controller.selectedCity.value == null) {
-                            Get.snackbar(
-                              "Error",
-                              "Please select state and district",
-                            );
-                            return;
-                          }
+onPressed: () {
+  if (controller.selectedState.value == null ||
+      controller.selectedCity.value == null) {
+    Get.snackbar("Error", "Please select state and district");
+    return;
+  }
 
-                          if (lengthController.text.isEmpty ||
-                              breadthController.text.isEmpty ||
-                              latitudeController.text.isEmpty ||
-                              longitudeController.text.isEmpty) {
-                            Get.snackbar("Error", "Please fill all fields");
-                            return;
-                          }
+  if (lengthController.text.isEmpty ||
+      breadthController.text.isEmpty ||
+      latitudeController.text.isEmpty ||
+      longitudeController.text.isEmpty) {
+    Get.snackbar("Error", "Please fill all fields");
+    return;
+  }
 
-                          controller.addProject(
-                            controller.selectedState.value!,
-                            controller.selectedCity.value!,
-                            lengthController.text,
-                            breadthController.text,
-                            latitudeController.text,
-                            longitudeController.text,
+  if (serviceController.selectedServiceIds.isEmpty) {
+    Get.snackbar("Error", "Please select at least one service");
+    return;
+  }
+
+  controller.addProject(
+    controller.selectedState.value!,
+    controller.selectedCity.value!,
+    lengthController.text,
+    breadthController.text,
+    latitudeController.text, 
+    longitudeController.text,
+  );
+},
+
+                        // onPressed: () {
+                        //   if (controller.selectedState.value == null ||
+                        //       controller.selectedCity.value == null) {
+                        //     Get.snackbar(
+                        //       "Error",
+                        //       "Please select state and district",
+                        //     );
+                        //     return;
+                        //   }
+
+                        //   if (lengthController.text.isEmpty ||
+                        //       breadthController.text.isEmpty ||
+                        //       latitudeController.text.isEmpty ||
+                        //       longitudeController.text.isEmpty) {
+                        //     Get.snackbar("Error", "Please fill all fields");
+                        //     return;
+                        //   }
+
+                        //   controller.addProject(
+                        //     controller.selectedState.value!,
+                        //     controller.selectedCity.value!,
+                        //     lengthController.text,
+                        //     breadthController.text,
+                        //     latitudeController.text,
+                        //     longitudeController.text,
                             
-                          );
-                        },
+                        //   );
+                        // },
 
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1F3C88),

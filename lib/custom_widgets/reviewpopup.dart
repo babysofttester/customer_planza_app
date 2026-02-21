@@ -1,5 +1,7 @@
 
 
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -30,13 +32,19 @@ class _ReviewPopupState extends State<ReviewPopup> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// HEADER
+         
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Leave a Review",
-                    // style: AppFonts.packageHeading(size: 15)
-                    ),
+                   Utils.textView(
+                 "Leave a Review",
+                  Get.width * 0.035,
+                  CustomColors.black,
+                  FontWeight.w500,
+                ),
+                // Text("Leave a Review",
+                //     // style: AppFonts.packageHeading(size: 15)
+                //     ),
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   child: const Icon(Icons.close, size: 20),
@@ -53,7 +61,7 @@ class _ReviewPopupState extends State<ReviewPopup> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    'assets/bgImage.png',
+                    'assets/images/bgImage.png',
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
@@ -67,16 +75,29 @@ class _ReviewPopupState extends State<ReviewPopup> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Adam Collins",
-                          // style: AppFonts.desHead()
-                          ),
+                       Utils.textView(
+                 "Adam Collins",
+                  Get.width * 0.045,
+                  CustomColors.black,
+                  FontWeight.bold,
+                ),
+                      // Text("Adam Collins",
+                      //     // style: AppFonts.desHead()
+                      //     ),
+
+                       Utils.textViewStyle(
+             "Jan 02, 2026",
+                  Get.width * 0.03,
+                  CustomColors.black,
+                  FontWeight.w400,
+                ),
                       const SizedBox(height: 2),
-                      Text(
-                        "Jan 02, 2026",
-                        // style: AppFonts.packageSubContent().copyWith(
-                        //   fontStyle: FontStyle.italic,
-                        // ),
-                      ),
+                      // Text(
+                      //   "Jan 02, 2026",
+                      //   // style: AppFonts.packageSubContent().copyWith(
+                      //   //   fontStyle: FontStyle.italic,
+                      //   // ),
+                      // ),
                       const SizedBox(height: 6),
 
 
@@ -131,10 +152,14 @@ class _ReviewPopupState extends State<ReviewPopup> {
                       ),
                     ),
                     onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      "Cancel",
-                        // style: AppFonts.bookButton(),
-                    ),
+                    child: 
+                     Utils.textView(
+                 "Cancel",
+                  Get.width * 0.035,
+                  CustomColors.white,
+                  FontWeight.w500,
+                ),
+                   
                   ),
                 ),
 

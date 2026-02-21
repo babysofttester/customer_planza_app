@@ -22,10 +22,22 @@ class ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final isSelected = controller.isSelected(index);
+      // final isSelected = controller.isSelected(index);
+
+      final serviceId = controller.services[index].id;
+final isSelected = controller.isSelected(serviceId);
 
       return GestureDetector(
-        onTap: () => controller.toggleSelection(index),
+
+        onTap: () {
+  final serviceId = controller.services[index].id;
+  controller.toggleSelection(serviceId);
+},
+        // onTap: () => controller.toggleSelection(index),
+  //         onTap: () {
+  //   final serviceId = controller.services[index].id; // use actual service ID
+  //   controller.toggleSelection(serviceId);
+  // },
         child: Container(
           padding: compact
               ? const EdgeInsets.symmetric(horizontal: 5, vertical: 5)

@@ -1,6 +1,7 @@
 
 
 import 'package:customer_app_planzaa/controller/addProjectController.dart';
+import 'package:customer_app_planzaa/controller/servicecontroller.dart';
 import 'package:customer_app_planzaa/custom_widgets/searchabledropdown.dart';
 import 'package:customer_app_planzaa/pages/addproject.dart';
 import 'package:flutter/material.dart';
@@ -143,10 +144,16 @@ void initState() {
                   ),
                 ),
                 onPressed: () {
-                  Get.to(()=>AddProject(projectId: widget.projectId, serviceIds: [],)); 
-
-                  // final nav = Get.find<BottomNavController>();
-                  // nav.changeIndex(1);
+                      if (Get.find<ServiceController>().selectedServiceIds.isEmpty) {
+      Get.snackbar("Error", "Please select at least one service");
+      return;
+    }
+                 
+ Get.to(() => AddProject(
+      projectId: widget.projectId,
+      serviceIds: Get.find<ServiceController>().selectedServiceIds.toList(),
+    ));
+               
 
                 },
 

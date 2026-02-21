@@ -110,14 +110,14 @@ final ServiceController serviceController = Get.find<ServiceController>();
   final RxnString selectedCity = RxnString();
 
  //RxList<int> selectedServices = <int>[].obs;
- RxList<int> selectedServiceIds = <int>[].obs;
-void toggleService(int serviceId) {
-  if (selectedServiceIds.contains(serviceId)) {
-    selectedServiceIds.remove(serviceId);
-  } else {
-    selectedServiceIds.add(serviceId);
-  }
-}
+//  RxList<int> selectedServiceIds = <int>[].obs;
+// void toggleService(int serviceId) {
+//   if (selectedServiceIds.contains(serviceId)) {
+//     selectedServiceIds.remove(serviceId);
+//   } else {
+//     selectedServiceIds.add(serviceId);
+//   }
+// }
 
 
   // void toggleService(int serviceId) {
@@ -146,18 +146,14 @@ void toggleService(int serviceId) {
         Get.snackbar("Error", "User not logged in");
         return;
       }
-
+if (serviceController.selectedServiceIds.isEmpty) {
+  Get.snackbar("Error", "Please select at least one service");
+  return;
+}
       final preparedImages = await _prepareImages();
-// List<int> serviceIds =
-//     serviceController.selectedServiceIds.toList();
 
-//     if (json['project_services'] != null) {
-//   serviceIds = List<int>.from(
-//     json['project_services'].map((e) => e['id'])
-//   );
-// }
 
-    print("SELECTED BEFORE API: $selectedServiceIds");
+    print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
       final body = {
         "state": state,
@@ -172,7 +168,9 @@ void toggleService(int serviceId) {
        // "services": selectedServices.toList(),
        // "services": serviceController.selectedServiceIds.toList(),
        
- "services": selectedServiceIds.toList(),
+ //"services": selectedServiceIds.toList(),
+ "services": serviceController.selectedServiceIds.toList(),
+
 
 
       };
@@ -195,45 +193,25 @@ void toggleService(int serviceId) {
       print("LAT: $latitude");
       print("LONG: $longitude");
       print("IMAGES COUNT: ${images.length}");
-      print("SERVICES: ${selectedServiceIds.toList()}");
+      print("SERVICES: ${serviceController.selectedServiceIds.toList()}");
 
 print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body); 
 
       if (response.statusCode == 200 && data['status'] == 'success') {
         // ✅ Show success snackbar
         Get.snackbar(
           "Success",
           data['message'] ?? "Project created successfully 🎉",
-          // backgroundColor: Colors.green,
-          // colorText: Colors.white,
-          // snackPosition: SnackPosition.BOTTOM,
-          // margin: const EdgeInsets.all(12),
-          // duration: const Duration(seconds: 2),
+          
         );
-        // Get.snackbar("Error", "Project created successfully 🎉");
-        // ✅ Small delay so user can see snackbar
+    
         await Future.delayed(const Duration(seconds: 1));
-         Get.to(() => const DesignerScreen());
-        // Get.find<BottomNavController>().openInner(
-        //   page: DesignerScreen(),
-        //   title: "Designer",
-        //   arguments: {
-        //     "state": selectedState.value,
-        //     "district": selectedCity.value,
-        //   },
-        // );
-        // // 2️⃣ Then update controller
-        // Get.find<DesignerController>().updateLocation(
-        //   selectedState.value,
-        //   selectedCity.value,
-        // );
-        // Get.find<BottomNavController>().openInner(
-        //   page: DesignerScreen(),
-        //   title: "Designer",
-        // );
-
+         Get.to(() => const DesignerScreen(
+          
+         ));
+      
 // Wait small time so screen builds
         await Future.delayed(const Duration(milliseconds: 200));
 

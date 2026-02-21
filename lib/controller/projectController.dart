@@ -15,6 +15,7 @@ class ProjectController extends GetxController {
 
 
   var projectList = <ProjectsItem>[].obs;
+   var projectId = 0.obs;
  // var isLoading = false.obs;
 ProjectDetailResponseModel? projectDetailModel;
   @override
@@ -25,7 +26,9 @@ ProjectDetailResponseModel? projectDetailModel;
   }
 
 
-
+  void setProjectId(int id) {
+    projectId.value = id;
+  }
   Future<void> fetchProjects() async {
     try {
       _tickerProvider;

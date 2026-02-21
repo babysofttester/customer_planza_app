@@ -1,6 +1,7 @@
 import 'package:customer_app_planzaa/common/assets.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/projectController.dart';
 import 'package:customer_app_planzaa/controller/servicecontroller.dart';
 import 'package:customer_app_planzaa/custom_widgets/architectpopup.dart';
 import 'package:customer_app_planzaa/pages/addproject.dart';
@@ -32,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     serviceController = Get.put(ServiceController(this));
+     Get.put(ProjectController(this));
   }
 
 

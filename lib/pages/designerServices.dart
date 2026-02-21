@@ -2,6 +2,7 @@ import 'package:customer_app_planzaa/common/appBar.dart';
 import 'package:customer_app_planzaa/common/assets.dart';
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/projectController.dart';
 import 'package:customer_app_planzaa/custom_widgets/choosePackage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _DesignerServicesState extends State<DesignerServices> with TickerProvider
   DesignerPortfolio? selectedPortfolio;
   DesignerPortfolio? selectedPortfolioDetail;
   bool isLoadingPortfolio = false;
+  // Service? selectedService;
 
   int selectedIndex = 0;
   late DesignerDetailController controller;
@@ -109,13 +111,13 @@ void initState() {
   controller.fetchDesignerDetail(widget.designerId);
 }
 
-
+final projectController = Get.find<ProjectController>();
   @override
   Widget build(BuildContext context) {
     return GetBuilder<DesignerDetailController>(
       builder: (controller) {
         if (controller.isLoading) {
-          return const Scaffold(
+          return const Scaffold( 
             body: Center(child: CircularProgressIndicator()),
           );
         }
@@ -201,9 +203,9 @@ void initState() {
         final service = item.services[index];
 
         return _serviceTile(
-          title: service['service_name'] ?? '',
-          price: "${item.currencySymbol}${service['price']}",
-        );
+  title: service.serviceName??'',
+  price: "${item.currencySymbol}${service.price}",
+);
       },
     );
   }
@@ -787,7 +789,9 @@ Utils.textView(
   }
 
   Widget _bottomBookButton() {
-    final int designerId; // ✅ must be declared
+    
+  
+    final int designerId;
     return Positioned(
       left: 0,
       right: 0,
@@ -814,18 +818,34 @@ Utils.textView(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            onPressed: () {
-              Get.to(() => ChoosePackage(designerId: widget.designerId));
-            },
-            child: Text(
-              "Book Now",
-              // style: AppFonts.bookButton()
-            ),
+          onPressed: () {
+
+  final services = widget.item.services;
+  print("services: ${services}");
+
+
+  Get.to(() => ChoosePackage(
+    projectId: projectController.projectId.value,
+    designer: widget.item,
+     services: services,
+  ));
+},
+            child: 
+             Utils.textView(
+                                  "Book Now",
+
+                                  Get.height * 0.02,
+                                  CustomColors.white,
+                                  FontWeight.bold,
+                                ),
+          
           ),
         ),
       ),
     );
   }
+
+
 }
 
 class _VideoPlayerWidget extends StatefulWidget {

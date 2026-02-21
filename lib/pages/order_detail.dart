@@ -1,3 +1,4 @@
+import 'package:customer_app_planzaa/modal/orderHistoryResponseModel.dart';
 import 'package:customer_app_planzaa/modal/orderModal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -9,7 +10,7 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 
 class OrderDetail extends StatefulWidget {
   final OrderItem? item;
-  const OrderDetail({super.key, this.item});
+  const OrderDetail({super.key, this.item, required Result order});
 
   @override
   State<OrderDetail> createState() => _OrderDetailState();

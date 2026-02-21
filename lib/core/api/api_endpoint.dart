@@ -15,5 +15,8 @@ class ApiEndpoints {
   static const designerDetail = "$baseUrl/designer-details";
   static const portfolioDetail = "$baseUrl/get-portfolio-details";
   static const projects = "$baseUrl/projects";
-  static const projectsDetails = "$baseUrl/project-details";
+  static const projectsDetails = "$baseUrl/project-details";//choose-package
+  static const choosePackage = "$baseUrl/choose-package";
+  static const checkout = "$baseUrl/checkout";
+    static const orders = "$baseUrl/orders";
 }

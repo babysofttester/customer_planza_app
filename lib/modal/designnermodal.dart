@@ -35,7 +35,7 @@ class DesignerItem {
 
   // ✅ NEW OPTIONAL FIELDS (for detail page)
   final String currencySymbol;
-  final List<dynamic> services;
+  final List<Service> services;
   final List<dynamic> portfolios;
   final List<dynamic> reviews;
 
@@ -46,22 +46,34 @@ class DesignerItem {
     required this.projectsDone,
     required this.amount,
     required this.rating,
-    this.currencySymbol = "₹",
-    this.services = const [],
+    this.currencySymbol = "₹", 
+    // this.services = const [],
+       this.services = const [],
     this.portfolios = const [],
     this.reviews = const [],
   });
 
   factory DesignerItem.fromJson(Map<String, dynamic> json) {
     return DesignerItem(
-      id: json['id'],
+      id: json['id'] ?? 0,
       name: json['name'] ?? '',
       image: json['avatar'] ?? '',
-      projectsDone: json['projects_done'] ?? 0,
+     projectsDone: json['projects_done'] is int
+    ? json['projects_done']
+    : int.tryParse(json['projects_done']?.toString() ?? '') ?? 0,
       amount: json['amount'].toString(),
-      rating: json['average_rating'] ?? 0,
+     rating: json['average_rating'] is int
+    ? json['average_rating']
+    : int.tryParse(json['average_rating']?.toString() ?? '') ?? 0,
       currencySymbol: json['currancy_symbol'] ?? "₹",
-      services: json['services'] ?? [],
+    //  services: json['services'] ?? [],
+     services: (json['services'] as List?)
+              ?.map((e) => Service.fromJson(e))
+              .toList() ??
+          [],
+    // services: (json['services'] as List?)
+    // ?.map((e) => Map<String, dynamic>.from(e))
+    // .toList() ?? [],
       portfolios: json['portfolios'] ?? [],
       reviews: json['reviews'] ?? [],
     );
@@ -90,6 +102,31 @@ String getServiceImage(String title) {
 }
 
 
+class Service {
+  int? id;
+  String? serviceName;
+  int? price;
+
+  Service({
+    this.id,
+    this.serviceName,
+     this.price,
+  });
+
+factory Service.fromJson(Map<String, dynamic> json) {
+  return Service(
+    id: json['service_id'] is int
+        ? json['service_id']
+        : int.tryParse(json['service_id']?.toString() ?? ''),
+
+    serviceName: json['service_name']?.toString() ?? '',
+
+    price: json['price'] is int
+        ? json['price']
+        : int.tryParse(json['price']?.toString() ?? ''),
+  );
+}
+}
 
 // final  List<DesignerItem> designers = [
 //   DesignerItem(
