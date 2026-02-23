@@ -309,69 +309,7 @@ class _ProjectDetailState extends State<ProjectDetail>
     );
   }
 
-/*   /// ================= START CHAT =================
-  Future<void> _startChat() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final currentUserID = prefs.getString("user_id");
-    final currentUserName = prefs.getString("user_name");
-
-    if (currentUserID == null) {
-      Get.snackbar("Error", "User not logged in");
-      return;
-    }
-
-    final result = controller.projectDetailModel.value.data?.result;
-
-    final targetUserID =
-        result?.designer?.id?.toString(); //   hardcoded 5
-    final targetUserName = result?.designer?.name ?? "Designer";
-
-    if (targetUserID == null || targetUserID.isEmpty) {
-      Get.snackbar("Error", "Designer not found");
-      return;
-    }
-
-    log("===== CHAT OPEN =====");
-    log("Current User: $currentUserID");
-    log("Target User: $targetUserID");
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ZIMKitMessageListPage(
-          conversationID: targetUserID,
-          conversationType: ZIMConversationType.peer,
-
-          ///  Custom AppBar with Call Button
-          appBarBuilder: (context, defaultAppBar) {
-            return AppBar(
-              title: Text(targetUserName),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.call),
-                  onPressed: () {
-                    ///  Voice Call
-                    ZegoUIKitPrebuiltCallInvitationService().send(
-                      isVideoCall: false,
-                      invitees: [
-                        ZegoCallUser(
-                          targetUserID,
-                          targetUserName,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-             ],
-            );
-          },
-        ),
-      ),
-    );
-  }
- */
-
+/* 
   Future<void> _startChat() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -437,8 +375,59 @@ class _ProjectDetailState extends State<ProjectDetail>
       ),
     );
   }
+ */
 
-  /// ================= START CALL =================
+Future<void> _startChat() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  final currentUserID = prefs.getString("user_id");
+  if (currentUserID == null) {
+    Get.snackbar("Error", "User not logged in");
+    return;
+  }
+
+  final result = controller.projectDetailModel.value.data?.result;
+  final designerID = result?.designer?.id?.toString();
+  final designerName = result?.designer?.name ?? "Designer";
+
+  if (designerID == null || designerID.isEmpty) {
+    Get.snackbar("Error", "Designer not found");
+    return;
+  }
+
+  log("===== PEER CHAT OPEN =====");
+  log("Customer: $currentUserID");
+  log("Designer: $designerID");
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ZIMKitMessageListPage(
+        conversationID: designerID,
+        conversationType: ZIMConversationType.peer,
+        appBarBuilder: (context, defaultAppBar) {
+          return AppBar(
+            title: Text(designerName),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.call),
+                onPressed: () {
+                  ZegoUIKitPrebuiltCallInvitationService().send(
+                    isVideoCall: false,
+                    invitees: [
+                      ZegoCallUser(designerID, designerName),
+                    ],
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    ),
+  );
+}
+
   Future<void> _startCall() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -446,7 +435,7 @@ class _ProjectDetailState extends State<ProjectDetail>
     final currentUserName = prefs.getString("user_name");
 
     if (currentUserID == null || currentUserName == null) {
-      Get.snackbar("Error", "User not logged in");
+      Utils.showToast("Error: User not logged in");
       return;
     }
 
@@ -455,7 +444,7 @@ class _ProjectDetailState extends State<ProjectDetail>
     final targetUserName = result?.designer?.name ?? "Designer";
 
     if (targetUserID == null || targetUserID.isEmpty) {
-      Get.snackbar("Error", "Designer not found");
+      Utils.showToast("Error: Designer not found");
       return;
     }
 
@@ -463,16 +452,31 @@ class _ProjectDetailState extends State<ProjectDetail>
     log("Caller: $currentUserID");
     log("Callee: $targetUserID");
 
-    ZegoUIKitPrebuiltCallInvitationService().send(
-      isVideoCall: false,
-      invitees: [
-        ZegoCallUser(
-          targetUserID,
-          targetUserName,
-        ),
-      ],
-    );
+    try {
+      await ZegoUIKitPrebuiltCallInvitationService().send(
+        isVideoCall: false,
+        invitees: [
+          ZegoCallUser(
+            targetUserID,
+            targetUserName,
+          ),
+        ],
+      );
+    } catch (e) {
+      log("Call error: $e");
+
+      String message = "Unable to place call.";
+
+      if (e.toString().contains("107026") ||
+          e.toString().contains("all called user not registered")) {
+        message = "User is offline or not available for calls.";
+      }
+
+      Utils.showToast("Call Failed: $message"
+          );
+    }
   }
+
 }
 
 
