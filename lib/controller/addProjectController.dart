@@ -126,11 +126,12 @@ final ServiceController serviceController = Get.find<ServiceController>();
       final token = await TokenService.getToken();
 
       if (token == null) {
-        Get.snackbar("Error", "User not logged in");
+        Utils.showToast("Error: User not logged in");
+       // Get.snackbar("Error", "User not logged in");
         return;
       }
 if (serviceController.selectedServiceIds.isEmpty) {
-  Get.snackbar("Error", "Please select at least one service");
+  Utils.showToast("Error: Please select at least one service");
   return;
 }
       final preparedImages = await _prepareImages();
@@ -184,11 +185,12 @@ print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
       if (response.statusCode == 200 && data['status'] == 'success') {
         // ✅ Show success snackbar
-        Get.snackbar(
-          "Success",
-          data['message'] ?? "Project created successfully 🎉",
+          Utils.showToast("Success: ${data['message'] ?? "Project created successfully 🎉"}");
+        // Get.snackbar(
+        //   "Success",
+        //   data['message'] ?? "Project created successfully 🎉",
           
-        );
+        // );
     
         await Future.delayed(const Duration(seconds: 1));
          Get.to(() => const DesignerScreen(
@@ -205,11 +207,12 @@ print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
 
       } else {
-        Get.snackbar("Error", data['message'] ?? "Add Project failed");
+          Utils.showToast("Error: ${data['message'] ?? "Failed to create project"}");
+      //  Get.snackbar("Error", data['message'] ?? "Add Project failed");
       }
     } catch (e) {
       print("ADD PROJECT ERROR: $e");
-      Get.snackbar("Error", "Something went wrong");
+      Utils.showToast("Error: Something went wrong");
     } finally {
       _tickerProvider;
       
@@ -226,7 +229,8 @@ print("STATE TOKEN: $token");
 
 
   if (token == null || token.isEmpty) {
-    Get.snackbar("Error", "User not logged in");
+    Utils.showToast("Error: User not logged in");
+   // Get.snackbar("Error", "User not logged in");
     return;
   }
   callWebApiGet( 
@@ -260,7 +264,8 @@ Future<void> fetchCities(String state) async {
   final token = await TokenService.getToken();
 
   if (token == null) {
-    Get.snackbar("Error", "User not logged in");
+     Utils.showToast("Error: User not logged in");
+    // Get.snackbar("Error", "User not logged in");
     return;
   }
 

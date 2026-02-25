@@ -96,7 +96,8 @@ Future<void> updateProfile({
   final userId = await TokenService.getUserId();
 
   if (userId == null) {
-    Get.snackbar("Error", "User ID missing");
+      Utils.showToast("Error: User ID missing");
+    // Get.snackbar("Error", "User ID missing");
     return;
   } 
   try {

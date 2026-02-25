@@ -26,7 +26,7 @@ var payments = <Result>[].obs;
 
   void fetchPaymentHistory() {
     if (authToken == null || authToken!.isEmpty) {
-      Get.snackbar("Error", "Auth token missing");
+        Utils.showToast("Auth token missing");
       return;
     }
 

@@ -33,17 +33,19 @@ void onInit() {
   Future<void> submitSupport() async { 
 
     if (selectedProjectId.isEmpty) {
-      Get.snackbar("Error", "Please select project");
+       Utils.showToast("Error: Please select project");
+      // Get.snackbar("Error", "Please select project");
       return;
     }
 
     if (selectedCategory.isEmpty) {
-      Get.snackbar("Error", "Please select category");
+       Utils.showToast("Error: Please select category");
+      // Get.snackbar("Error", "Please select category");
       return;
     }
 
     if (descriptionController.text.trim().isEmpty) {
-      Get.snackbar("Error", "Please enter message");
+      Utils.showToast("Error: Please enter message");
       return;
     }
 
@@ -72,7 +74,7 @@ void onInit() {
 
           if (model.status == "success") {
               Utils.showToast("Support Submitted Successfully");
-            Get.snackbar("Success", model.message ?? "Submitted");
+            // Get.snackbar("Success", model.message ?? "Submitted");
 
             selectedCategory = "";
             selectedProjectId = "";
@@ -109,7 +111,7 @@ Future<void> fetchProjects() async {
   if (authToken == null || authToken!.isEmpty) {
     isProjectLoading = false;
     update();
-    Get.snackbar("Error", "Token not found");
+        Utils.showToast("Error: Token not found");
     return;
   }
 

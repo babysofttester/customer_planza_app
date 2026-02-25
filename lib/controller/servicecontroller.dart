@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:core' as Utils;
+
 import 'dart:core';
 import 'package:customer_app_planzaa/common/constants.dart';
 import 'package:customer_app_planzaa/common/load_manager.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/core/api/api_endpoint.dart';
 import 'package:customer_app_planzaa/modal/servicemodal.dart';
 import 'package:customer_app_planzaa/modal/services_response_model.dart';
@@ -47,7 +48,8 @@ Future<void> fetchServices() async {
 _tickerProvider;
     if (authToken == null || authToken!.isEmpty) {
       print("TOKEN IS NULL");
-      Get.snackbar("Error", "User not logged in");
+       Utils.showToast("Error: User not logged in");
+      // Get.snackbar("Error", "User not logged in");
       return;
     }
 
@@ -74,13 +76,15 @@ _tickerProvider;
 
 
       } else {
-        Get.snackbar("Error",
-            model.message ?? "Failed to load services");
+         Utils.showToast(model.message ?? "Failed to load services");
+        // Get.snackbar("Error",
+        //     model.message ?? "Failed to load services");
       }
 
     } else {
-      Get.snackbar(
-          "Error", "Server Error: ${response.statusCode}");
+       Utils.showToast("Server Error: ${response.statusCode}");
+      // Get.snackbar(
+      //     "Error", "Server Error: ${response.statusCode}");
     }
 
   } catch (e) {
@@ -89,7 +93,8 @@ _tickerProvider;
           e.printInfo();
           Utils.print(e.toString());
   //  print("Service error: $e");
-    Get.snackbar("Error", e.toString());
+     Utils.showToast("Server Error: ${e.toString()}");
+    // Get.snackbar("Error", e.toString());
   } finally {
     _tickerProvider;
     //isLoading.value = false;

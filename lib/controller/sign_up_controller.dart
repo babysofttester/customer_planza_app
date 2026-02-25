@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:customer_app_planzaa/common/load_manager.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
@@ -83,7 +84,8 @@ class SignUpController extends GetxController {
     final phone = phoneController.text.trim();
 
     if (email.isEmpty || phone.isEmpty) {
-      Get.snackbar("Error", "Email and phone are required");
+        Utils.showToast("Error: Email and phone are required");
+      // Get.snackbar("Error", "Email and phone are required");
       return;
     }
 

@@ -33,7 +33,8 @@ class OrderHistoryController extends GetxController {
  
   void fetchOrders() {
     if (authToken == null || authToken!.isEmpty) {
-      Get.snackbar("Error", "Auth token missing");
+          Utils.showToast("Error: Auth token missing");
+      // Get.snackbar("Error", "Auth token missing");
       return;
     }
 

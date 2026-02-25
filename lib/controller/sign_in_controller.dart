@@ -34,7 +34,8 @@ class SignInController extends GetxController {
     final email = emailController.text.trim();
 
     if (email.isEmpty) {
-      Get.snackbar("Error", "Please enter email");
+        Utils.showToast("Error: Please enter email");
+      // Get.snackbar("Error", "Please enter email");
       return;
     }
 

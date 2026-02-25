@@ -294,15 +294,19 @@ if (showSurveyor) ...[
                     const Color(0xFF1F3C88),
               ),
               onPressed: () {
-                paymentController.openCheckout(
-                  orderNumber:
-                      result.orderNo ?? "",
-                  amount: grandTotal,
-                  name: result.designer?.name ?? "",
-                  description:
-                      "Payment for Order ${result.orderNo}",
-                );
-              },
+  paymentController.openCheckout(
+    orderNumber: result.orderNo ?? "", 
+    amount: grandTotal,
+    name: result.designer?.name ?? "",
+    description: "Payment for Order ${result.orderNo}",
+    projectId: widget.projectId,
+    designerId: widget.designerId,
+    subTotal: subtotal,
+    tax: gst,
+    totalAmount: grandTotal,
+    jobType: result.jobType ?? "",
+  );
+},
               child: Text(
                 "Pay ₹${grandTotal.toStringAsFixed(0)}",
                 style: const TextStyle(
@@ -311,6 +315,8 @@ if (showSurveyor) ...[
               ),
             ),
           ),
+        
+        
         ],
       ),
     ),
