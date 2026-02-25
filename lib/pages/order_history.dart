@@ -47,7 +47,7 @@ class _OrderHistoryState extends State<OrderHistory> with TickerProviderStateMix
         padding: const EdgeInsets.only(bottom: 8),
         child: GestureDetector(
           onTap: () {
-            Get.to(() => OrderDetail(order: item)); 
+            Get.to(() => OrderDetail( bookingNo: item.bookingNo ?? '',)); 
           },
           child: OrderCard(item: item),
         ),

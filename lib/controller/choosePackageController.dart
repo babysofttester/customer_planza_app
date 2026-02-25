@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 //import 'package:get/get_connect/http/src/response/response.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ChoosePackageController extends GetxController {
@@ -23,8 +22,9 @@ class ChoosePackageController extends GetxController {
       ChoosePackageResponseModel().obs;
 
 
-  late SharedPreferences prefs;
+
   String? authToken;  
+  
 
 Future<void> choosePackage({
   required int projectId,
@@ -57,52 +57,36 @@ Future<void> choosePackage({
 
         if (choosePackageResponse.value.status == "success") {
 
-          String orderNo =
-              choosePackageResponse.value.data?.result?.orderNo ?? "";
+  String orderNo =
+      choosePackageResponse.value.data?.result?.orderNo ?? "";
 
-          print("ORDER NO: $orderNo");
+  print("ORDER NO: $orderNo");
 
-// DesignerItem? fullDesigner = await getDesignerDetails(designer.id);
-
-// if (fullDesigner != null) {
-//   Get.to(() => PaymentScreen(
-//     orderNo: orderNo,
-//     projectId: 102,
-//     designerId: fullDesigner.id,
-//     subTotal: 4800, 
-//     tax: 18,
-//     totalAmount: 5664,
-//     item: fullDesigner,
-//     jobType: jobTypeText,
-//   ));
-// }
-
+  double subTotal = double.tryParse(price) ?? 0.0;
+  double tax = subTotal * 0.18;   
+  double totalAmount = subTotal + tax;
 
   Get.to(() => PaymentScreen(
-         orderNo: orderNo,
-  projectId: projectId,
-  designerId: designer.id,
-  subTotal: double.parse(price),
-  tax: 18,
-  totalAmount: double.parse(price) * 1.18,
-  item: designer,
-  jobType: jobTypeText,
-  designer: designer, 
-  seriviceId: serviceId, 
-  serviceName: serviceName,
-  // serviceId: serviceId,
-  // serviceName: serviceName,r
-  // price: price,
-      ));
+    orderNo: orderNo,
+    projectId: projectId,
+    designerId: designer.id,
+    subTotal: subTotal,
+    tax: tax,
+    totalAmount: totalAmount,
+    jobType: jobTypeText,
+    designer: designer,
+    seriviceId: serviceId,
+    serviceName: serviceName,
+  ));
 
- print("SERVICE ID: $serviceId");
-print("DESIGNER ID: ${designer.id}");
-print("PROJECT ID: $projectId");
+  print("SERVICE ID: $serviceId");
+  print("DESIGNER ID: ${designer.id}");
+  print("PROJECT ID: $projectId");
 
-        } else {
-          Utils.showToast(
-              choosePackageResponse.value.message ?? "Something went wrong");
-        }
+} else {
+  Utils.showToast(
+      choosePackageResponse.value.message ?? "Something went wrong");
+} 
 
       } catch (e) {
         LoaderManager.hideLoader();

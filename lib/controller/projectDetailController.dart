@@ -9,6 +9,7 @@ import 'package:customer_app_planzaa/common/utils.dart';
 import 'package:customer_app_planzaa/common/web_service.dart';
 import 'package:customer_app_planzaa/core/api/api_endpoint.dart';
 import 'package:customer_app_planzaa/modal/project_detail_response_model.dart';
+import 'package:customer_app_planzaa/modal/serviceFileResponseModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -22,13 +23,25 @@ class ProjectDetailController extends GetxController {
 
   Rx<ProjectDetailResponseModel> projectDetailModel =
       ProjectDetailResponseModel().obs;
- late SharedPreferences prefs;
-  @override
+      Rx<ServiceFilesResponseModel?> serviceFiles =
+    Rx<ServiceFilesResponseModel?>(null);
+       
+    //   RxList<ServiceFilesResponseModel> serviceFiles = <ServiceFilesResponseModel>[].obs;
+//  late SharedPreferences prefs;
+
+// @override
+// void onInit() {
+//   super.onInit();
+//   getProjectDetails(projectId.toString());
+// }
+  @override 
   Future<void> onInit() async {
     super.onInit();
-    prefs = await SharedPreferences.getInstance();
+    // prefs = await SharedPreferences.getInstance();
     await getProjectDetails(projectId.toString());
   }
+
+
 /* 
 Future<void> getProjectDetails() async {
   print("API CALLED WITH ID: $projectId");
@@ -86,9 +99,10 @@ try {
 
  */
 
-  getProjectDetails(String pID) {
+  getProjectDetails(String pID) async {
     Utils.print("pID:: $pID");
 
+ final prefs = await SharedPreferences.getInstance();
     var authToken = prefs.getString(Constants.AUTH_TOKEN);
 
     Utils.print("auth token: $authToken");
@@ -96,7 +110,10 @@ try {
       "project_id": pID,
     };
 
-    callWebApi( _tickerProvider,   ApiEndpoints.projectsDetails, data,
+    callWebApi( 
+      _tickerProvider,   
+      ApiEndpoints.projectsDetails, 
+      data,
         onResponse: (http.Response response) async {
       var responseJson = jsonDecode(response.body);
 
@@ -124,4 +141,93 @@ try {
   }
 
 
+
+///////// Services Get Upload Api//////////
+///
+
+
+
+
+Future<void> uploadServiceFiles({
+  required int projectId,
+  required int serviceId,
+  required String title,
+  required List<Map<String, String>> images,
+}) async {
+
+  try {
+
+    final prefs = await SharedPreferences.getInstance();
+    final authToken = prefs.getString(Constants.AUTH_TOKEN);
+
+    Map<String, dynamic> data = {
+      "project_id": projectId,
+      "service_id": serviceId,
+      "user_type": "customer",
+      "title": title,
+      "media": images,
+    };
+
+    callWebApi(
+      _tickerProvider,
+      ApiEndpoints.serviceFileUpload,
+      data,
+      token: authToken,
+      onResponse: (http.Response response) async {
+
+        var jsonResponse = jsonDecode(response.body);
+
+        if (jsonResponse['status'] == "success") {
+
+          Utils.showToast(jsonResponse['message']);
+
+          /// ⭐ Refresh project detail OR file list API
+           await getProjectDetails(projectId.toString());
+           
+
+        } else {
+          Utils.showToast(jsonResponse['message'] ?? "Upload failed");
+        }
+
+        LoaderManager.hideLoader();
+      },
+    );
+
+  } catch (e) {
+    Utils.print("Upload Error: $e");
+  }
 }
+
+
+Future<void> loadServiceFiles(int projectId, int serviceId) async {
+
+  final prefs = await SharedPreferences.getInstance();
+  final authToken = prefs.getString(Constants.AUTH_TOKEN);
+
+  Map<String, dynamic> data = {
+    "project_id": projectId,
+    "service_id": serviceId,
+    "user_type": "customer",
+  };
+
+  callWebApi( 
+    _tickerProvider,
+    ApiEndpoints.projectsDetails,
+    data,
+    token: authToken,
+    onResponse: (response) async {
+
+      var jsonData = jsonDecode(response.body);
+
+      if (jsonData['status'] == "success") {
+
+        serviceFiles.value =
+            ServiceFilesResponseModel.fromJson(jsonData);
+
+      }
+
+    },
+  );
+}
+}
+

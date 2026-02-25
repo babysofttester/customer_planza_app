@@ -15,8 +15,15 @@ class ApiEndpoints {
   static const designerDetail = "$baseUrl/designer-details";
   static const portfolioDetail = "$baseUrl/get-portfolio-details";
   static const projects = "$baseUrl/projects";
-  static const projectsDetails = "$baseUrl/project-details";//choose-package
+  static const projectsDetails = "$baseUrl/project-details";
   static const choosePackage = "$baseUrl/choose-package";
   static const checkout = "$baseUrl/checkout";
     static const orders = "$baseUrl/orders";
+    static const ordersDetails = "$baseUrl/orders-detail-history";
+    static const paymentHistory = "$baseUrl/payments-history";
+    static const support = "$baseUrl/support";
+    static const review = "$baseUrl/review";
+    static const cartDetails = "$baseUrl/cart-details";
+    static const serviceFileUpload = "$baseUrl/service-file-upload";
+     static const RazorpayApiKey = "rzp_test_Rv36ieKm0mSeuM";
 }

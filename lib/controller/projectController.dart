@@ -18,7 +18,7 @@ class ProjectController extends GetxController {
    var projectId = 0.obs;
  // var isLoading = false.obs;
 ProjectDetailResponseModel? projectDetailModel;
-  @override
+  @override 
   void onInit() {
     fetchProjects();
     // getProjectDetails();

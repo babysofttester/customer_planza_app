@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 
 class Home extends StatefulWidget {
+  
   const Home({super.key});
 
   @override
@@ -88,10 +89,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           });
         },
       ),
-      const ServiceScreen(),
+      const ServiceScreen(), 
       ProjectPage(),
       const OrderHistory(),
-      const ProfileScreen(),
+   ProfileScreen(
+  onTabChange: (index) {
+    setState(() {  
+      pageIndex = index;
+
+      if (index == 0) appTitle = "Home";
+      if (index == 1) appTitle = "Services";
+      if (index == 2) appTitle = "Projects";
+      if (index == 3) appTitle = "Order History";
+      if (index == 4) appTitle = "Profile";
+    });
+  },
+),
     ];
 
     load();
@@ -156,38 +169,40 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
               centerTitle: true,
               actions: [
-                GestureDetector(
-                  onTap: () async {
-                    Get.to(() => const ProfileScreen());
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: Get.width * 0.03),
-                    // width: 55,
-                    //               height: 55,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border:
-                          Border.all(color: CustomColors.textGrey, width: 2),
-                      // color: _emojis[i] == null
-                      //     ? Colors.transparent
-                      //     : CustomColors.black,
-                    ),
-                    // decoration: BoxDecoration(),
-                    child: const Icon(
-                      Icons.person_outline,
-                      color: CustomColors.textGrey,
-                    ) /* IconButton(
-                      icon: const Icon(
-                        Icons.person_outline,
-                        color: CustomColors.textGrey,
-                      ),
-                      onPressed: () async {
-                        Get.to(() => const Profile());
-                      },
-                    ), */
-                    ,
-                  ),
-                ),
+                // GestureDetector( 
+                //   onTap: () async {
+                    
+                //     Get.to(() => const ProfileScreen());
+                //   },
+                //   child: Container(
+                //     margin: EdgeInsets.only(right: Get.width * 0.03),
+                //     // width: 55,
+                //     //               height: 55,
+                //     decoration: BoxDecoration(
+                //       shape: BoxShape.circle,
+                //       border:
+                //           Border.all(color: CustomColors.textGrey, width: 2),
+                //       // color: _emojis[i] == null
+                //       //     ? Colors.transparent
+                //       //     : CustomColors.black,
+                //     ),
+                //     // decoration: BoxDecoration(),
+                //     child: const Icon(
+                //       Icons.person_outline,
+                //       color: CustomColors.textGrey,
+                //     ) /* IconButton(
+                //       icon: const Icon(
+                //         Icons.person_outline,
+                //         color: CustomColors.textGrey,
+                //       ),
+                //       onPressed: () async {
+                //         Get.to(() => const Profile());
+                //       },
+                //     ), */
+                //     ,
+                //   ),
+                // ),
+              
               ],
             ),
       body: pages[pageIndex!],

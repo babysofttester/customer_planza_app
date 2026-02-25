@@ -122,14 +122,16 @@ class Services {
   String? serviceId;
   String? serviceName;
   String? status;
+  String? amount;
   List<Submissions>? submissions;
 
-  Services({this.serviceId, this.serviceName, this.status, this.submissions});
+  Services({this.serviceId, this.serviceName, this.status,this.amount,  this.submissions});
 
   Services.fromJson(Map<String, dynamic> json) {
     serviceId = json['service_id'];
     serviceName = json['service_name'];
     status = json['status'];
+     amount = json['amount'];
     if (json['submissions'] != null) {
       submissions = <Submissions>[];
       json['submissions'].forEach((v) {

@@ -109,24 +109,7 @@ final ServiceController serviceController = Get.find<ServiceController>();
   final RxnString selectedState = RxnString();
   final RxnString selectedCity = RxnString();
 
- //RxList<int> selectedServices = <int>[].obs;
-//  RxList<int> selectedServiceIds = <int>[].obs;
-// void toggleService(int serviceId) {
-//   if (selectedServiceIds.contains(serviceId)) {
-//     selectedServiceIds.remove(serviceId);
-//   } else {
-//     selectedServiceIds.add(serviceId);
-//   }
-// }
 
-
-  // void toggleService(int serviceId) {
-  //   if (selectedServices.contains(serviceId)) {
-  //     selectedServices.remove(serviceId);
-  //   } else {
-  //     selectedServices.add(serviceId);
-  //   }
-  // }
 
   Future<void> addProject(
       dynamic state,
@@ -235,45 +218,6 @@ print("SELECTED BEFORE API: ${serviceController.selectedServiceIds}");
 
   
   
-  //state
-  // Future<void> fetchStates() async {
-  //   try {
-  //     _tickerProvider;
-  //     final token = await TokenService.getToken();
-
-  //     if (token == null) {
-  //       Get.snackbar("Error", "User not logged in");
-  //       return;
-  //     }
-
-  //     final response = await http.get(
-  //       Uri.parse(ApiEndpoints.getStates),
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Accept": "application/json",
-  //       },
-  //     );
-
-  //     print("STATES STATUS CODE: ${response.statusCode}");
-  //     print("STATES RESPONSE BODY: ${response.body}");
-
-  //     final data = jsonDecode(response.body);
-
-  //     if (response.statusCode == 200 && data['status'] == 'success') {
-  //       states.assignAll(
-  //         List<String>.from(data['data']['states']),
-  //       );
-  //     } else {
-  //       Get.snackbar(
-  //         "Error",
-  //         data['message'] ?? "Failed to load states",
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print("STATE API ERROR: $e");
-  //     Get.snackbar("Error", "State API error");
-  //   }
-  // }
 
 Future<void> fetchStates() async {
   

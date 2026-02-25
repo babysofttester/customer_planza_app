@@ -16,9 +16,10 @@ import '../controller/profileController.dart';
 import 'editProfilePage.dart';
 
 class ProfileScreen extends StatefulWidget {
+   final Function(int)? onTabChange;
   final ProjectsItem? item;
 
-  const ProfileScreen({super.key, this.item});
+  const ProfileScreen({super.key, this.item, this.onTabChange});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -129,10 +130,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                         children: [
                           Stack(
                             children: [
-                              CircleAvatar(
-                                radius: 40,
-                                backgroundImage: imageProvider,
-                              ),
+                             CircleAvatar(
+  radius: 40, 
+  backgroundColor: Colors.grey.shade200,
+  backgroundImage: controller.profileImageFile != null
+      ? FileImage(controller.profileImageFile!)
+      : (controller.customer?.avatar != null &&
+              controller.customer!.avatar!.contains(".jpg"))
+          ? NetworkImage(controller.customer!.avatar!)
+          : AssetImage(Assets.profilePNG) as ImageProvider,
+), 
                               Positioned(
                                 bottom: 0,
                                 right: 0,
@@ -185,24 +192,27 @@ class _ProfileScreenState extends State<ProfileScreen>
 
             
                 _menuItem(Icons.home_outlined, "Dashboard", () {
-                  Get.to(() => const HomeScreen());
+                   widget.onTabChange?.call(0); 
+                  // Get.to(() => const HomeScreen());
                 }),
 
                 _menuItem(Icons.file_copy_outlined, "Projects", () {
-                  Get.to(() => OrderHistory());
+                   widget.onTabChange?.call(2); 
+                  // Get.to(() => OrderHistory());
                 }),
 
                 _menuItem(Icons.card_travel, "Order History", () {
-                  Get.to(() => const OrderHistory());
+                      widget.onTabChange?.call(3); 
+                  // Get.to(() => const OrderHistory());
                 }),
 
                 _menuItem(Icons.payment, "Payment History", () {
-                  Get.to(() => const PaymentHistory());
+                  Get.to(() => const PaymentHistory()); 
                 }),
 
-                _menuItem(Icons.lock_outline_rounded, "Forgot Password", () {
-                  Get.to(() => const SupportScreen());
-                }),
+                // _menuItem(Icons.lock_outline_rounded, "Forgot Password", () {
+                //   Get.to(() => const SupportScreen());
+                // }),
 
                 _menuItem(Icons.email_outlined, "Support", () {
                   Get.to(() => const SupportScreen());

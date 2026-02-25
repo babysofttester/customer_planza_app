@@ -34,10 +34,10 @@ class _ChoosePackageState extends State<ChoosePackage> with TickerProviderStateM
 
     packageController = Get.put(ChoosePackageController(this));
 
-    // Auto-fill services if empty
+   
     servicesToUse = widget.services;
-    if (servicesToUse.isEmpty && widget.designer.services != null && widget.designer.services!.isNotEmpty) {
-      servicesToUse = widget.designer.services!;
+    if (servicesToUse.isEmpty && widget.designer.services!= null && widget.designer.services!.isNotEmpty) {
+      servicesToUse = widget.designer.services;
     }
   }
 
@@ -190,7 +190,7 @@ class _ChoosePackageState extends State<ChoosePackage> with TickerProviderStateM
                     projectId: widget.projectId,
                     packageType: packageType,
                     designer: widget.designer,
-                    jobTypeText: jobTypeText,
+                    jobTypeText: packageType,
                     serviceId: service.id ?? 0,
                     serviceName: service.serviceName ?? '',
                     price: service.price?.toString() ?? '0',

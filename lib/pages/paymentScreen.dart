@@ -7,6 +7,7 @@ import 'package:customer_app_planzaa/modal/choosePackageModel.dart';
 import 'package:customer_app_planzaa/modal/designnermodal.dart';
 import 'package:customer_app_planzaa/modal/paymentResponseModel.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -48,461 +49,273 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen>
     with TickerProviderStateMixin {
   late PaymentController paymentController;
-late ProjectDetailController projectController;
-  @override
-  void initState() {
-    super.initState();
-    paymentController = Get.put(PaymentController(this));
-      print("Designer services: ${widget.item?.services}");
 
-     //projectController = Get.put(ProjectDetailController(this));
 
- // projectController.getProjectDetails(widget.projectId);
+@override 
+void initState() {
+  super.initState();
+
+  paymentController = Get.put(PaymentController(this));
+
+  paymentController.getCartDetails(
+    projectId: widget.projectId.toString(),
+    designerId: widget.designerId.toString(),
+  );
 
   print("PROJECT ID: ${widget.projectId}");
-  }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomColors.white,
       appBar: const CustomAppBar(title: "Payment"),
-//       body: SingleChildScrollView(
-//         child: Padding(
-//           padding: const EdgeInsets.all(18),
-//           child: Column(
-//             children: [
-//               Row(
-//                 children: [
-//                   Utils.textView(
-//                     'Order ',
-//                     Get.width * 0.04,
-//                     CustomColors.black,
-//                     FontWeight.w500,
-//                   ),
-//                   Utils.textView(
-//                     widget.orderNo,
-//                     Get.width * 0.04,
-//                     CustomColors.black,
-//                     FontWeight.w600,
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: Get.height * 0.02),
-//               Column(
-//                 children: [
-//                   Container(
-//                     margin: const EdgeInsets.only(bottom: 16),
-//                     padding: const EdgeInsets.all(12),
-//                     decoration: BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.circular(12),
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.black.withOpacity(0.2),
-//                           blurRadius: 8,
-//                           offset: const Offset(0, 8),
-//                         ),
-//                       ],
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         Row(
-//                           children: [
-//                             Container(
-//                               decoration: BoxDecoration(
-//                                 shape: BoxShape.circle,
-//                                 boxShadow: [
-//                                   BoxShadow(
-//                                     color: Colors.black.withOpacity(0.1),
-//                                     blurRadius: 12,
-//                                     spreadRadius: 2,
-//                                     offset: const Offset(0, 2),
-//                                   ),
-//                                 ],
-//                               ),
-//                               child:  CircleAvatar(
-//   radius: 28,
-//   backgroundImage: (widget.item != null && widget.item!.image.isNotEmpty)
-//       ? NetworkImage(widget.item!.image)
-//       : null,
-//   child: (widget.item == null || widget.item!.image.isEmpty)
-//       ? const Icon(Icons.person, size: 28)
-//       : null,
-// ),
+      body: Obx(() {
+  final cartModel = paymentController.cartDetailModel.value;
+
+  if (cartModel == null ||
+      cartModel.data == null ||
+      cartModel.data!.result == null) {
+    return const Center();
+  }
+
+  final result = cartModel.data!.result!;
+  final services = result.services ?? [];
+
+  double subtotal = 0;
+
+  for (var service in services) {
+    String priceString = service.totalPrice ?? '0';
+
+    priceString =
+        priceString.replaceAll('₹', '').replaceAll(',', '');
+
+    subtotal += double.tryParse(priceString) ?? 0;
+  }
+
+  double gst = subtotal * 0.18;
+  double grandTotal = subtotal + gst;
+
+
+  double surveyorAmount =
+    double.tryParse(result.surveyorTotal ?? "0") ?? 0;
+
+bool showSurveyor =
+    result.jobType == "designer_surveyor" &&
+    surveyorAmount > 0;
+
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        children: [
+
+         
+          Row(
+            children: [
+              Utils.textView(
+                'Order ',
+                Get.width * 0.04,
+                CustomColors.black,
+                FontWeight.w500,
+              ),
+              Utils.textView(
+                result.orderNo ?? "",
+                Get.width * 0.04,
+                CustomColors.black,
+                FontWeight.w600,
+              ),
+            ],
+          ),
+
+          SizedBox(height: Get.height * 0.02),
+
+         
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+
+            
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundImage:
+                          result.designer?.avatar != null
+                              ? NetworkImage(result.designer!.avatar!)
+                              : null,
+                      child: result.designer?.avatar == null
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Utils.textView(
+                          result.designer?.name ?? "",
+                          Get.width * 0.04,
+                          CustomColors.black,
+                          FontWeight.w600,
+                        ),
+                        Utils.textView(
+                          result.jobType ?? "",
+                          Get.width * 0.04,
+                          CustomColors.black,
+                          FontWeight.w400,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const Divider(),
+
+            
+                Column(
+                  children: services.map((service) {
+                    return Padding(
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 4),
+                      child: _serviceRow(
+                        service.serviceName ?? "",
+                        service.totalPrice ?? "",
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: Get.height * 0.02),
 
 
 
-//                             ),
 
-//                             const SizedBox(width: 12),
 
-//                             Column(
-//                               crossAxisAlignment: CrossAxisAlignment.start,
-//                               children: [
+if (showSurveyor) ...[
+  Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 8,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Utils.textView(
+          'Surveyor Total',
+          Get.width * 0.04,
+          CustomColors.black,
+          FontWeight.w600,
+        ),
+        Utils.textView(
+          "₹${surveyorAmount.toStringAsFixed(0)}",
+          Get.width * 0.04,
+          CustomColors.black,
+          FontWeight.w400,
+        ),
+      ],
+    ),
+  ),
 
-//                                  Utils.textView(
-//                     widget.item!.name,
-//                     Get.width * 0.04,
-//                     CustomColors.black,
-//                     FontWeight.w600,
-//                   ),
-                             
-//                                  Utils.textView(
-//                      widget.jobType,
-//                     Get.width * 0.04,
-//                     CustomColors.black,
-//                     FontWeight.w400,
-//                   ),
-                           
-                                
-//                               ],
-//                             ),
-//                           ],
-//                         ),
-//                         // AppSizes.paySize(),
-//                         // Divider(height: Get.height * 0.04),
-//                         // // AppSizes.paySize(),
-                        
-//                         // _serviceRow(widget.item!.services, widget.item!.amount,),
-//          GetBuilder<ProjectDetailController>(
-//   builder: (controller) {
-
-//     if (controller.projectDetailModel == null) {
-//       return const Padding(
-//         padding: EdgeInsets.all(12),
-//         child: CircularProgressIndicator(),
-//       );
-//     }
-
-//  final services =
-//     controller.projectDetailModel?.data?.result?.services ?? [];
-
-// // if (services.isEmpty) {
-// //   return const Padding(
-// //     padding: EdgeInsets.all(8),
-// //     child: Text("No services found"),
-// //   );
-// // } 
-
-// return Column(
-//   children: services.map<Widget>((service) {
-
-//     final serviceName = service.serviceName ?? '';
-//     final serviceStatus = service.status ?? '';
-
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 4),
-//       child: _serviceRow(
-//         serviceName,
-//         serviceStatus,
-//       ),
-//     );
-
-//   }).toList(),
-// );
-//   },
-// ),
-//                         // // AppSizes.paySize(),
-//                         Divider(height: Get.height * 0.01),
-//                         // // AppSizes.paySize(),
-//                         // _serviceRow('Interior Design', '₹5,000'), 
-//                         // AppSizes.paySize(),
-// //                       Column(
-// //   crossAxisAlignment: CrossAxisAlignment.start,
-// //   children: [ 
-// //     if (widget.item != null && widget.item!.services.isNotEmpty)
-// //       ...widget.item!.services.map<Widget>((service) {
-// //         String serviceName = "";
-
+  SizedBox(height: Get.height * 0.02), 
+],
         
-// //         if (service is Map<String, dynamic>) {
-// //           serviceName = service['name'] ?? '';
-// //         }
-       
-// //         else if (service is String) {
-// //           serviceName = service;
-// //         }
+        
+        
+        Container(
+  decoration: BoxDecoration(  
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 8,
+        offset: const Offset(0, 6),
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+      _PaymentRow(
+        icon: Icons.receipt_long,
+        title: 'Subtotal',
+        amount: '₹${subtotal.toStringAsFixed(0)}',
+      ),
+      const Divider(height: 1),
 
-// //         return Padding(
-// //           padding: const EdgeInsets.symmetric(vertical: 4),
-// //           child: Text(
-// //             serviceName,
-// //             style: TextStyle(
-// //               fontSize: Get.width * 0.038,
-// //               fontWeight: FontWeight.w500,
-// //               color: CustomColors.black,
-// //             ),
-// //           ),
-// //         );
-// //       }).toList(),
-// //   ],
-// // )
+      _PaymentRow(
+        icon: Icons.percent,
+        title: 'GST (18%)',
+           amount: '₹${gst.toStringAsFixed(0)}',
+      ),
+      const Divider(height: 1),
 
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: Get.height * 0.01),
-//               Column(
-//                 children: [
-//                   Container(
-//                     margin: const EdgeInsets.only(bottom: 16),
-//                     padding: const EdgeInsets.all(12),
-//                     decoration: BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.circular(12),
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.black.withOpacity(0.2),
-//                           blurRadius: 8,
-//                           offset: const Offset(0, 8),
-//                         ),
-//                       ],
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         Row(
-//                           children: [
-//                             Container(
-//                               decoration: BoxDecoration(
-//                                 shape: BoxShape.circle,
-//                                 boxShadow: [
-//                                   BoxShadow(
-//                                     color: Colors.black.withOpacity(0.1),
-//                                     blurRadius: 12,
-//                                     spreadRadius: 2,
-//                                     offset: const Offset(0, 2),
-//                                   ),
-//                                 ],
-//                               ),
-//                               child: const CircleAvatar(
-//                                 radius: 28,
-//                                 backgroundImage: AssetImage(
-//                                   'assets/images/profile2.jpg',
-//                                 ),
-//                               ),
-//                             ),
+      _PaymentRow(
+        icon: Icons.assignment,
+        title: 'Grand Total',
+        amount: '₹${grandTotal.toStringAsFixed(0)}',
+        isBold: true,
+      ),
+    ],
+  ),
+),
+          SizedBox(height: Get.height * 0.02),
 
-//                             const SizedBox(width: 12),
-
-//                             Column(
-//                               crossAxisAlignment: CrossAxisAlignment.start,
-//                               children: [
-//                                 Text(
-//                                   'Taylor Russell',
-//                                   // style: AppFonts.heading(size: 16),
-//                                 ),
-//                                 // const SizedBox(height: 4),
-//                                 Text(
-//                                   'Surveyor',
-//                                   // style: AppFonts.prosubHead(
-//                                   //   size: 12,
-//                                   //   color: AppColors.textSecondary3,
-//                                   // ),
-//                                 ),
-//                               ],
-//                             ),
-//                           ],
-//                         ),
-//                         // AppSizes.paySize(),
-//                         Divider(height: Get.height * 0.01),
-//                         // AppSizes.paySize(),
-//                         _serviceRow('Total Earn', '₹1,000'),
-
-//                         //  AppSizes.paySize(),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: Get.height * 0.01),
-//               Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     'Payment Summary',
-//                     // style: AppFonts.heading(size: 16),
-//                   ),
-//                   SizedBox(height: Get.height * 0.01),
-//                   Column(
-//                     children: [
-//                       Container(
-//                         margin: const EdgeInsets.only(bottom: 16),
-//                         decoration: BoxDecoration(
-//                           color: Colors.white,
-//                           borderRadius: BorderRadius.circular(12),
-//                           boxShadow: [
-//                             BoxShadow(
-//                               color: Colors.black.withOpacity(0.12),
-//                               blurRadius: 8,
-//                               offset: const Offset(0, 6),
-//                             ),
-//                           ],
-//                         ),
-//                         child: Column(
-//                           children: [
-//                             const SizedBox(height: 10),
-
-//                             /// Subtotal
-//                             Padding(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 12,
-//                               ),
-//                               child: Row(
-//                                 children: [
-//                                   Icon(
-//                                     Icons.file_copy_outlined,
-//                                     size: 20,
-//                                     color: Colors.blueGrey,
-//                                   ),
-//                                   const SizedBox(width: 10),
-//                                   _serviceRow1('Subtotal', '₹6,000'),
-//                                 ],
-//                               ),
-//                             ),
-
-//                             // AppSizes.paySize(),
-//                             Divider(height: Get.height * 0.01),
-//                             // AppSizes.paySize(),
-
-//                             /// GST
-//                             Padding(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 12,
-//                               ),
-//                               child: Row(
-//                                 children: [
-//                                   Icon(
-//                                     Icons.receipt_long,
-//                                     size: 20,
-//                                     color: Colors.blueGrey,
-//                                   ),
-//                                   const SizedBox(width: 10),
-//                                   _serviceRow1('GST (18%)', '₹1,080'),
-//                                 ],
-//                               ),
-//                             ),
-
-//                             // AppSizes.paySize(),
-//                             Container(
-//                               width: double.infinity,
-//                               padding: const EdgeInsets.symmetric(
-//                                 vertical: 14,
-//                                 horizontal: 12,
-//                               ),
-//                               decoration: const BoxDecoration(
-//                                 color: Color(0xFFF1F6FF),
-//                                 borderRadius: BorderRadius.only(
-//                                   bottomLeft: Radius.circular(12),
-//                                   bottomRight: Radius.circular(12),
-//                                 ),
-//                               ),
-//                               child: Row(
-//                                 children: [
-//                                   Icon(
-//                                     Icons.assignment_outlined,
-//                                     size: 22,
-//                                     color: Colors.blueGrey,
-//                                   ),
-//                                   const SizedBox(width: 12),
-
-//                                   Expanded(
-//                                     child: Row(
-//                                       children: [
-//                                         Text(
-//                                           'Grand Total',
-//                                           // style: AppFonts.payment()
-//                                         ),
-//                                         const SizedBox(width: 6),
-//                                         const Icon(
-//                                           Icons.check_circle_rounded,
-//                                           // color: AppColors.paymentTick,
-//                                           size: 18,
-//                                         ),
-//                                       ],
-//                                     ),
-//                                   ),
-
-//                                   Text(
-//                                     '₹7,080',
-//                                     style: const TextStyle(
-//                                       fontSize: 18,
-//                                       fontWeight: FontWeight.bold,
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-
-//                       SizedBox(height: Get.height * 0.001),
-//                       SafeArea(
-//                         child: SizedBox(
-//                           width: double.infinity,
-//                           height: 40,
-//                           child: ElevatedButton(
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: const Color(0xFF1F3C88),
-//                               shape: RoundedRectangleBorder(
-//                                 borderRadius: BorderRadius.circular(6),
-//                               ),
-//                             ),
-//                             onPressed: () {
-//                               paymentController.checkout(
-//                                 orderNumber: widget.orderNo,
-//                                 projectId: widget.projectId,
-//                                 designerId: widget.designerId,
-//                                 subTotal: widget.subTotal,
-//                                 tax: widget.tax,
-//                                 totalAmount: widget.totalAmount,
-//                               );
-//                             },
-
-//                             child: Text(
-//                               "Pay ₹7,080",
-//                               style: TextStyle(
-//                                 fontSize: 15,
-//                                 color: Colors.white,
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       SizedBox(height: Get.height * 0.01),
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Text(
-//                             'By proceteding, I accept the ',
-//                             // style: AppFonts.payment1()
-//                           ),
-//                           Text(
-//                             'Terms ',
-//                             // style: AppFonts.payment11()
-//                           ),
-//                           Text(
-//                             'and ',
-//                             // style: AppFonts.payment1()
-//                           ),
-//                           Text(
-//                             'Conditions. ',
-//                             // style: AppFonts.payment11()
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-    
+ 
+          SizedBox(
+            width: double.infinity,
+            height: 45,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    const Color(0xFF1F3C88),
+              ),
+              onPressed: () {
+                paymentController.openCheckout(
+                  orderNumber:
+                      result.orderNo ?? "",
+                  amount: grandTotal,
+                  name: result.designer?.name ?? "",
+                  description:
+                      "Payment for Order ${result.orderNo}",
+                );
+              },
+              child: Text(
+                "Pay ₹${grandTotal.toStringAsFixed(0)}",
+                style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}),
     );
   
   
@@ -512,14 +325,21 @@ late ProjectDetailController projectController;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          // style: AppFonts.payment()
-        ),
-        Text(
-          price,
-          // style: AppFonts.payment()
-        ),
+        Utils.textView(
+                    title,
+                    Get.width * 0.04,
+                    CustomColors.black,
+                    FontWeight.w400, 
+                  ),
+                           
+       
+
+        Utils.textView(
+                    price,
+                    Get.width * 0.04,
+                    CustomColors.black,
+                    FontWeight.w400, 
+                  ),
       ],
     );
   }
@@ -529,15 +349,107 @@ late ProjectDetailController projectController;
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            // style: AppFonts.payment()
-          ),
-          Text(amount, style: const TextStyle(fontWeight: FontWeight.w500)),
+          
+        Utils.textView(
+                    title,
+                    Get.width * 0.04,
+                    CustomColors.black,
+                    FontWeight.w400, 
+                  ),
+        
+          
+        Utils.textView(
+                    amount,
+                    Get.width * 0.04,
+                    CustomColors.black,
+                    FontWeight.w400, 
+                  ),
+        
         ],
       ),
     );
   }
 
 
+}
+class _PaymentRow extends StatelessWidget {
+  final String title;
+  final String amount;
+  final bool isBold;
+  final IconData icon;
+
+  const _PaymentRow({
+    required this.title,
+    required this.amount,
+    this.isBold = false,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isGrandTotal = isBold;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: isGrandTotal
+            ? Color.fromARGB(255, 245, 247, 255)
+            : Colors.transparent,
+        borderRadius: isGrandTotal
+            ? const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              )
+            : BorderRadius.zero,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 22,
+                color: isGrandTotal
+                    ? const Color(0xFF1F3C88)
+                    : CustomColors.boxColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: isGrandTotal ? 15 : 14,
+                  fontWeight:
+                      isGrandTotal ? FontWeight.bold : FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+
+              if (isGrandTotal) ...[
+                const SizedBox(width: 6),
+                const CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Colors.green,
+                  child: Icon(
+                    Icons.check,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ]
+            ],
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: isGrandTotal ? 18 : 14,
+              fontWeight:
+                  isGrandTotal ? FontWeight.bold : FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

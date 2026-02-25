@@ -111,7 +111,7 @@ void initState() {
   controller.fetchDesignerDetail(widget.designerId);
 }
 
-final projectController = Get.find<ProjectController>();
+final projectController = Get.find<ProjectController>(); 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<DesignerDetailController>(
@@ -214,7 +214,7 @@ final projectController = Get.find<ProjectController>();
    // final controller = Get.find<DesignerDetailController>();
 
     if (isLoadingPortfolio) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center();
     }
 
     if (selectedPortfolioDetail != null) {
@@ -789,9 +789,9 @@ Utils.textView(
   }
 
   Widget _bottomBookButton() {
-    
+    // final DesignerItem designerItem;
   
-    final int designerId;
+    // final int designerId;
     return Positioned(
       left: 0,
       right: 0,
@@ -818,18 +818,34 @@ Utils.textView(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-          onPressed: () {
+         onPressed: () {
+          print("Sending Project ID: ${projectController.projectId}");
 
-  final services = widget.item.services;
-  print("services: ${services}");
+  final updatedDesigner = controller.designer;
 
+  if (updatedDesigner == null) {
+    Utils.showToast("Designer data not loaded yet");
+    return;
+  }
 
-  Get.to(() => ChoosePackage(
-    projectId: projectController.projectId.value,
-    designer: widget.item,
-     services: services,
-  ));
+  if (updatedDesigner.services.isEmpty) {
+    Utils.showToast("No services available");
+    return;
+  }
+
+  print("Updated Services: ${updatedDesigner.services}");
+
+ Get.dialog(
+  ChoosePackage(
+    projectId: updatedDesigner.id,
+    designer: updatedDesigner,
+    services: updatedDesigner.services,
+  ),
+);
+
 },
+            
+            
             child: 
              Utils.textView(
                                   "Book Now",

@@ -1,5 +1,6 @@
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/reviewController.dart';
 import 'package:customer_app_planzaa/custom_widgets/reviewpopup.dart';
 import 'package:customer_app_planzaa/modal/orderModal.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +11,23 @@ import 'package:customer_app_planzaa/modal/choosePackageModel.dart' hide Result;
 import 'package:customer_app_planzaa/modal/orderHistoryResponseModel.dart';
 
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final Result item;
-  const OrderCard({super.key, required this.item});
+   OrderCard({super.key, required this.item});
+
+  @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> with TickerProviderStateMixin{
+late ReviewController controller;
+
+@override
+void initState() {
+  super.initState();
+
+  controller = Get.put(ReviewController(this));
+}
 
   Color statusTextColor(String? status) {
     final s = status?.toLowerCase().trim() ?? '';
@@ -36,7 +51,7 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = statusTextColor(item.projectStatus);
+    final statusColor = statusTextColor(widget.item.projectStatus);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -65,7 +80,7 @@ class OrderCard extends StatelessWidget {
                   FontWeight.w500,
                 ),
                       Utils.textView(
-                  '${item.bookingNo}',
+                  '${widget.item.bookingNo}',
                   Get.width * 0.04,
                   CustomColors.black,
                   FontWeight.w600,
@@ -76,14 +91,14 @@ class OrderCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                     Utils.textView(
-                 item.userName ?? '',
+                 widget.item.userName ?? '',
                   Get.width * 0.038,
                   CustomColors.black,
                   FontWeight.w600,
                 ),//textViewStyle
                     
                   Utils.textViewStyle(
-             item.assignedAt ?? '',
+             widget.item.assignedAt ?? '',
                   Get.width * 0.03,
                   CustomColors.black,
                   FontWeight.w400,
@@ -103,7 +118,7 @@ class OrderCard extends StatelessWidget {
                 ),
                 child: 
                  Utils.textView(
-                   item.projectStatus ?? '',
+                   widget.item.projectStatus ?? '',
                   Get.width * 0.038,
                   statusColor,
                   FontWeight.w600,
@@ -112,7 +127,7 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
                              Utils.textView(
-                 '₹ ${item.amount ?? "0"}',
+                 '₹ ${widget.item.amount ?? "0"}',
                   Get.width * 0.038,
                   CustomColors.boxColor,
                   FontWeight.w600,
@@ -127,14 +142,26 @@ class OrderCard extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (_) => const ReviewPopup(),
-                  );
-                },
-                child: 
+               onPressed: () async {
+  // await controller.getOrderDetail(widget.item.projectId.toString());
+
+  final designer =
+      controller.orderDetailModel?.data?.result?.designer;
+
+  showDialog(
+    context: context,
+    barrierDismissible: true, 
+    builder: (_) => ReviewPopup(
+      projectId: widget.item.projectId.toString(),
+      userId: widget.item.userId.toString(),
+      userType: "designer",
+      userName: designer?.name ?? widget.item.userName ?? "",
+     // avatar: designer?.avatar ?? "", 
+      assignedDate: widget.item.assignedAt ?? "",
+    ),
+  ); 
+},
+                child:  
                   Utils.textView(
                  "Leave a Review",
                   Get.width * 0.035,

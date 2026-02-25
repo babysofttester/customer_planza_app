@@ -1,14 +1,28 @@
 
+import 'package:customer_app_planzaa/common/custom_colors.dart';
+import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/paymentHistoryController.dart';
+import 'package:customer_app_planzaa/modal/choosePackageModel.dart' hide Result;
+import 'package:customer_app_planzaa/modal/paymentModal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:customer_app_planzaa/modal/paymentHistoryResponseModel.dart';
 
-import '../../../../modal/paymentModal.dart';
-// import '../../../../utils/app_fonts.dart';
 
-class PaymentCard extends StatelessWidget {
-  final PaymentItem item;
+
+class PaymentCard extends StatefulWidget {
+  // final PaymentItem item;
+  final Result item;
   const PaymentCard({super.key, required this.item});
+
+  @override
+  State<PaymentCard> createState() => _PaymentCardState();
+}
+
+class _PaymentCardState extends State<PaymentCard> with TickerProviderStateMixin{
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,46 +48,72 @@ class PaymentCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      'Project ID ',
-                      // style: AppFonts.proHead2(),
-                    ),
-                    Text(
-                      item.projectId,
-                      // style: AppFonts.desHead(),
-                    ),
+                  Utils.textView(
+                  'Project ID ',
+                  Get.width * 0.04,
+                  CustomColors.black,
+                  FontWeight.w500,
+                ),
+                      Utils.textView(
+                  widget.item.projectId?? '',
+                  Get.width * 0.04,
+                  CustomColors.black,
+                  FontWeight.w600,
+                ),
+                
                   ],
                 ),
 
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(
-                      'Transaction ID: ',
-                      // style: AppFonts.packageSubHeading(),
-                    ),
-                    Text(
-                      item.transId,
-                      // style: AppFonts.packageSubHeading2(),
-                    ),
+                      Utils.textView(
+                   'Transaction ID: ',
+                  Get.width * 0.04,
+                  CustomColors.black,
+                  FontWeight.w500,
+                ),
+                      Utils.textView(
+                        widget.item.transactionId ?? '',
+                  //widget.item.transactionId ?? '',
+                  Get.width * 0.038,
+                  CustomColors.boxColor,
+                  FontWeight.w500,
+                ),
+                   
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '₹ ${item.amount}',
-                  // style: AppFonts.packageSubHeading4(),
+                    Utils.textView(
+                  '₹ ${widget.item.amount ?? ''}',
+                  Get.width * 0.038,
+                  CustomColors.black,
+                  FontWeight.w600,
                 ),
+                
 
                 const SizedBox(height: 4),
-                Text(
-                  item.dateTime,
-                  // style: AppFonts.packageSubHeading3(),
+                 Utils.textViewStyle(
+                   widget.item.paidDate ?? '',
+                  Get.width * 0.038,
+                  CustomColors.black,
+                  FontWeight.w400,
                 ),
+               
                 const SizedBox(height: 4),
-                Text(
-                  item.payMethod,
-                  // style: AppFonts.packageSubHeading3(size: 11),
-                ),
+                 Row(
+                   children: [
+                    Icon(Icons.cloud_outlined, size: 15,),
+                    const SizedBox(width: 4),
+                     Utils.textView(
+                      widget.item.paymentMethod ?? '',
+                      Get.width * 0.035,
+                      CustomColors.black,
+                      FontWeight.w400,
+                                     ),
+                   ],
+                 ),
+               
 
               ],
             ),
@@ -95,7 +135,7 @@ class PaymentCard extends StatelessWidget {
               //  color: statusColor,
               ),
             ),
-          ),
+          ), 
         ],
       ),
     );

@@ -67,10 +67,11 @@ class DesignerItem {
     : int.tryParse(json['average_rating']?.toString() ?? '') ?? 0,
       currencySymbol: json['currancy_symbol'] ?? "₹",
     //  services: json['services'] ?? [],
-     services: (json['services'] as List?)
-              ?.map((e) => Service.fromJson(e))
-              .toList() ??
-          [],
+   services: json['services'] != null
+    ? List<Service>.from(
+        json['services'].map((x) => Service.fromJson(x)),
+      )
+    : [],
     // services: (json['services'] as List?)
     // ?.map((e) => Map<String, dynamic>.from(e))
     // .toList() ?? [],
@@ -105,29 +106,22 @@ String getServiceImage(String title) {
 class Service {
   int? id;
   String? serviceName;
-  int? price;
+  String? price;
 
   Service({
     this.id,
     this.serviceName,
-     this.price,
+    this.price,
   });
 
-factory Service.fromJson(Map<String, dynamic> json) {
-  return Service(
-    id: json['service_id'] is int
-        ? json['service_id']
-        : int.tryParse(json['service_id']?.toString() ?? ''),
-
-    serviceName: json['service_name']?.toString() ?? '',
-
-    price: json['price'] is int
-        ? json['price']
-        : int.tryParse(json['price']?.toString() ?? ''),
-  );
+  factory Service.fromJson(Map<String, dynamic> json) {
+    return Service(
+      id: json['service_id'],   
+      serviceName: json['service_name'], 
+      price: json['price'],
+    );
+  }
 }
-}
-
 // final  List<DesignerItem> designers = [
 //   DesignerItem(
 //     name: 'Adam Collins',

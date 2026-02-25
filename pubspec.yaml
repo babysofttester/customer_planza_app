@@ -79,6 +79,7 @@ dependencies:
   zego_uikit_prebuilt_call: ^4.22.3
   zego_uikit_signaling_plugin: ^2.8.20
   zego_zimkit: ^1.19.9
+  razorpay_flutter: ^1.4.1
 
   # zego_uikit_prebuilt_call: ^4.14.3
   # zego_zimkit: ^1.18.16

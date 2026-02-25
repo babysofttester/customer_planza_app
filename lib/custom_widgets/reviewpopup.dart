@@ -2,23 +2,61 @@
 
 import 'package:customer_app_planzaa/common/custom_colors.dart';
 import 'package:customer_app_planzaa/common/utils.dart';
+import 'package:customer_app_planzaa/controller/reviewController.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import '../controller/bottomnavcontroller.dart';
+
 
 class ReviewPopup extends StatefulWidget {
-  const ReviewPopup({super.key});
+  final String projectId;
+  final String userId;
+  final String userType;
+  final String userName;
+   // final String? avatar;
+ // final String userImage;
+  final String assignedDate;
 
+  const ReviewPopup({
+    super.key,
+    required this.projectId,
+    required this.userId,
+    required this.userType,
+    required this.userName,
+  //  required this.userImage,
+    required this.assignedDate, 
+    //this.avatar, 
+  });
   @override
   State<ReviewPopup> createState() => _ReviewPopupState();
 }
 
-class _ReviewPopupState extends State<ReviewPopup> {
-  int rating = 5;
+class _ReviewPopupState extends State<ReviewPopup> with TickerProviderStateMixin{
+
+  @override
+void initState() {
+  super.initState();
+
+  Get.put(ReviewController(this));
+}
+ int rating = 0;
   final TextEditingController reviewCtrl = TextEditingController();
 
+String getTodayDate() { 
+  final now = DateTime.now();
+  return "${now.day.toString().padLeft(2, '0')} "
+      "${_monthName(now.month)} "
+      "${now.year}";
+}
+
+String _monthName(int month) {
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+  return months[month - 1];
+}
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -60,58 +98,77 @@ class _ReviewPopupState extends State<ReviewPopup> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
+                  child: 
+                  
+          //        CircleAvatar(
+          //   radius: 40,
+          //   backgroundImage: widget.avatar != null && widget.avatar!.isNotEmpty
+          //       ? NetworkImage(widget.avatar!)
+          //       : null,
+          //   child: widget.avatar == null || widget.avatar!.isEmpty
+          //       ? const Icon(Icons.person, size: 40)
+          //       : null,
+          // ),
+                  Image.asset(
                     'assets/images/bgImage.png',
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
-                  ),
+                  ),  
                 ),
 
-
+ 
                 const SizedBox(width: 12),
 
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Utils.textView(
-                 "Adam Collins",
-                  Get.width * 0.045,
-                  CustomColors.black,
-                  FontWeight.bold,
-                ),
-                      // Text("Adam Collins",
-                      //     // style: AppFonts.desHead()
-                      //     ),
+                      Utils.textView(
+  widget.userName,
+  Get.width * 0.045,
+  CustomColors.black,
+  FontWeight.bold,
+),
+                     
+//                       Utils.textViewStyle(
+//   widget.assignedDate,
+//   Get.width * 0.03,
+//   CustomColors.black,
+//   FontWeight.w400,
+// ),
 
-                       Utils.textViewStyle(
-             "Jan 02, 2026",
-                  Get.width * 0.03,
-                  CustomColors.black,
-                  FontWeight.w400,
-                ),
-                      const SizedBox(height: 2),
-                      // Text(
-                      //   "Jan 02, 2026",
-                      //   // style: AppFonts.packageSubContent().copyWith(
-                      //   //   fontStyle: FontStyle.italic,
-                      //   // ),
-                      // ),
+Utils.textViewStyle(
+  getTodayDate(),
+  Get.width * 0.03,
+  CustomColors.black,
+  FontWeight.w400,
+),
+                   
+                    
                       const SizedBox(height: 6),
 
 
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            index < rating
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: const Color(0xFFF4B400),
-                            size: 20,
-                          );
-                        }),
-                      ),
+                    Row(
+  children: List.generate(5, (index) {
+    final isSelected = index < rating;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          rating = index + 1;
+        });
+      },  
+      child: Icon(
+        isSelected ? Icons.star : Icons.star_border,
+        color: isSelected
+            ? const Color(0xFFF1BF47) 
+            : Colors.grey.shade400,
+        size: 28,
+      ),
+    );
+  }),
+),
                     ],
                   ),
                 ),
@@ -139,7 +196,7 @@ class _ReviewPopupState extends State<ReviewPopup> {
 
             const SizedBox(height: 20),
 
-            /// ACTION BUTTONS
+          
             Row(
               children: [
                 Expanded(
@@ -173,15 +230,29 @@ class _ReviewPopupState extends State<ReviewPopup> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                    ),
-                    onPressed: () {
-                      // submit logic
-                      Navigator.pop(context);
-                    },
-                    child:  Text(
-                      "Submit Review",
-                        // style: AppFonts.bookButton(),
-                    ),
+                    ), 
+                  onPressed: () {
+  if (reviewCtrl.text.trim().isEmpty) {
+    Utils.showToast("Please write review"); 
+    return;
+  }
+
+  Get.find<ReviewController>().submitReview(
+  projectId: widget.projectId,
+  userType: widget.userType,
+  userId: widget.userId,
+  rating: rating,
+  comment: reviewCtrl.text.trim(),  
+);
+},
+                    child:  
+                     Utils.textView(
+                 "Submit Review",
+                  Get.width * 0.035,
+                  CustomColors.white,
+                  FontWeight.w500,
+                ),
+                    
                   ),
                 ),
               ],

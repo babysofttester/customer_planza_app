@@ -61,6 +61,7 @@ fetchProfile();
         if (profileResponseModel.value.status == "success") {
           // profileResponseModel.value = model;
           customer = profileResponseModel.value.data?.customer;
+          print("AVATAR URL: ${customer?.avatar}");
 
           update(); 
         } else {
@@ -110,7 +111,7 @@ Future<void> updateProfile({
     request.fields['name'] = name;
     request.fields['email'] = email;
 
-    /// 🔥 Attach image if exists
+    
     if (image != null) {
       request.files.add(
         await http.MultipartFile.fromPath(
