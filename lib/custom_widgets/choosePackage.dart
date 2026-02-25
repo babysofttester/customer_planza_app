@@ -183,7 +183,7 @@ class _ChoosePackageState extends State<ChoosePackage> with TickerProviderStateM
 
                   final service = servicesToUse.first;
 
-                  String packageType = selected == 0 ? "designer" : "designer_surveyor";
+                  String packageType = selected == 0 ? "designer" : "both";
                   String jobTypeText = selected == 0 ? "Designer" : "Both";
 
                   packageController.choosePackage(
