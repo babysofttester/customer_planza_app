@@ -80,11 +80,9 @@ dependencies:
   zego_uikit_signaling_plugin: ^2.8.20
   zego_zimkit: ^1.19.9
   razorpay_flutter: ^1.4.1
-
-  # zego_uikit_prebuilt_call: ^4.14.3
-  # zego_zimkit: ^1.18.16
-  # zego_uikit_signaling_plugin: ^2.8.20
-
+  zego_uikit: ^2.28.38
+  flutter_ringtone_player: ^4.0.0+4
+  zego_zim: ^2.27.0
 
 dev_dependencies:
   flutter_test:
