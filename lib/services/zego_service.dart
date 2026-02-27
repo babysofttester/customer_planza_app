@@ -5,6 +5,7 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:zego_uikit_signaling_plugin/zego_uikit_signaling_plugin.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
 import 'package:zego_zim/zego_zim.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'notification_service.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
@@ -40,22 +41,32 @@ class ZegoService {
             List<ZegoCallUser> callees,
             String customData,
           ) {
+            // play ringtone and display a call notification so the user is
+            // alerted no matter what state the app is in.
             FlutterRingtonePlayer().play(
               android: AndroidSounds.ringtone,
               looping: true,
             );
+            NotificationService.showCallNotification(
+              title: 'Incoming call',
+              body: '${caller.name} is calling',
+            );
           },
           onIncomingCallCanceled: (_, __, ___) {
             FlutterRingtonePlayer().stop();
+            NotificationService.cancelCallNotification();
           },
           onIncomingCallTimeout: (_, __) {
             FlutterRingtonePlayer().stop();
+            NotificationService.cancelCallNotification();
           },
           onIncomingCallAcceptButtonPressed: () {
             FlutterRingtonePlayer().stop();
+            NotificationService.cancelCallNotification();
           },
           onIncomingCallDeclineButtonPressed: () {
             FlutterRingtonePlayer().stop();
+            NotificationService.cancelCallNotification();
           },
         ),
         requireConfig: (ZegoCallInvitationData data) {
@@ -79,7 +90,26 @@ class ZegoService {
         return false;
       }
 
+      // grab the FCM token so that notifications can be delivered when the
+      // app is not running. your backend should associate this token with the
+      // logged in user and use it to send data messages (type=chat or type=call).
+      try {
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        print('🔑 FCM token: $fcmToken');
+        // TODO: transmit the token + userID to your server
+      } catch (e) {
+        print('⚠️ failed fetching FCM token: $e');
+      }
+
       /// 3️⃣ SET MESSAGE LISTENER (STATIC CALLBACK)
+      ///
+      /// When the app is active this handler will be triggered as messages
+      /// arrive, and we show a local notification immediately so the user is
+      /// aware.  **However**, if the application is backgrounded or killed the
+      /// ZIM SDK will not deliver events; in that case your backend must issue
+      /// a push notification (e.g. via FCM) containing `data.type=chat` or
+      /// `data.type=call`.  The shared `NotificationService` class will handle
+      /// those incoming pushes and surface the appropriate notification.
       ZIMEventHandler.onPeerMessageReceived = (ZIM zim,
           List<ZIMMessage> messageList,
           ZIMMessageReceivedInfo info,

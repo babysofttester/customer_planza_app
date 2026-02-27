@@ -1,4 +1,5 @@
 import 'package:customer_app_planzaa/common/constants.dart';
+import 'package:customer_app_planzaa/firebase_options.dart';
 import 'package:customer_app_planzaa/pages/splash_screen.dart';
 import 'package:customer_app_planzaa/services/notification_service.dart';
 import 'package:customer_app_planzaa/services/zego_service.dart';
@@ -7,10 +8,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await NotificationService.init(); 
+  // firebase must be initialised before using messaging or any other
+  // firebase service.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await NotificationService.init();
+
+  // handle situation when app is launched via notification
+  FirebaseMessaging.instance.getInitialMessage().then((message) {
+    if (message != null) {
+      NotificationService.handleMessage(message);
+    }
+  });
+
   runApp(MyApp());
 }
 
@@ -35,7 +51,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _initZego() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getInt(Constants.IS_LOGGED_IN) == 1;
 
@@ -50,7 +66,7 @@ class _MyAppState extends State<MyApp> {
           userName: userName,
           navigatorKey: _navigatorKey,
         );
-        
+
         if (success) {
           print("✅ Zego initialized for $userId");
         } else {

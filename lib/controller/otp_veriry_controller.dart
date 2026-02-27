@@ -91,7 +91,7 @@ class OtpVerifyController extends GetxController {
   }
 
   verifyOtp(String otp) async {
-    String fcmToken = prefs.getString(Constants.fcmToken) ?? "hghg";
+    String fcmToken = prefs.getString(Constants.fcmToken) ?? "";
 
     List<File> files = [];
 

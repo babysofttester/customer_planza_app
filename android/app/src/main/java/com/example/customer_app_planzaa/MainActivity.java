@@ -1,4 +1,4 @@
-package com.example.customer_app_planzaa;
+package com.customer.planzaa;
 
 import io.flutter.embedding.android.FlutterActivity;
 
